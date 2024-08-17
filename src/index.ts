@@ -21,14 +21,18 @@ import fs, { PathLike } from "fs";
 */
 
 const tempPath = path.join(process.cwd(), "temp");
+if (!fs.existsSync(tempPath)) {
+    fs.mkdirSync(tempPath);
+}
 
 const packFileName = "16x";
-const xpNotFullValPercent = 40 / 100;
+const xpNotFullValPercent = 50 / 100;
+let scalingFactor = 1;
 
 const packPath = path.join(process.cwd(), "__mocks__", `${packFileName}.zip`);
 const packSavePath = path.join(tempPath, packFileName);
 
-// await unzipFile(packPath, packSavePath);
+await unzipFile(packPath, packSavePath);
 
 const guiFolderPath = path.join(
     packSavePath,
@@ -71,10 +75,13 @@ const savePaths = {
     uiImg: path.join(uiSavePath, `${packFileName}_ui.png`),
 };
 
+await getResolution();
 await processGUI();
 await processIcons();
 await generateUI();
-// clean()
+// clean();
+
+function getResolution() {}
 
 async function processIcons() {
     /* ---- Hunger ---- */
@@ -165,7 +172,7 @@ async function processGUI() {
         widgetsPath,
         savePaths.selector,
         1,
-        23,
+        22,
         22,
         22,
         "SELECTOR"
@@ -207,7 +214,7 @@ async function combineParts(
 
         ctx.drawImage(firstTwoSlots, 0, 1);
         ctx.drawImage(lastSlot, firstTwoSlots.width, 1);
-        ctx.drawImage(selector, lastSlot.width, 0);
+        ctx.drawImage(selector, lastSlot.width - 2, 0);
 
         const guiBuffer = canvas.toBuffer();
         fs.writeFileSync(outputPath, guiBuffer);
