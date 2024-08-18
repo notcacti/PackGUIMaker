@@ -2,6 +2,7 @@ import path from "path";
 import * as unzipper from "unzipper";
 import { createCanvas, Image, loadImage } from "canvas";
 import fs, { PathLike } from "fs";
+import sharp from "sharp";
 
 const tempPath = path.join(process.cwd(), "temp");
 if (!fs.existsSync(tempPath)) {
@@ -121,10 +122,38 @@ const guiCoordinates: { [key: string]: Coordinates } = {
     },
 };
 
+await preProcessFixes();
 await processGUI();
 await processIcons();
 await generateUI();
 clean();
+
+async function preProcessFixes() {
+    const widgetsDims = {
+        width: (await loadImage(widgetsPath)).width,
+        height: (await loadImage(widgetsPath)).height,
+    };
+
+    const iconsDims = {
+        width: (await loadImage(iconsPath)).width,
+        height: (await loadImage(iconsPath)).height,
+    };
+
+    if (widgetsDims === iconsDims) return;
+    if (widgetsDims.width < iconsDims.width) {
+        const imageBuffer = await upscaleImage(
+            widgetsPath,
+            ~~(iconsDims.width / widgetsDims.width)
+        );
+        fs.writeFileSync(widgetsPath, imageBuffer);
+    } else if (iconsDims.width < widgetsDims.width) {
+        const imageBuffer = await upscaleImage(
+            iconsPath,
+            ~~(widgetsDims.width / iconsDims.width)
+        );
+        fs.writeFileSync(iconsPath, imageBuffer);
+    }
+}
 
 async function getResolution(spriteSheetPath: string) {
     return ~~((await loadImage(spriteSheetPath)).height / 16);
@@ -474,6 +503,26 @@ async function generateUI() {
     fs.writeFileSync(savePaths.uiImg, uiBuffer);
 
     console.log("COMPLETED PROCESS");
+}
+
+// shameless edited chatgpt code
+async function upscaleImage(inputPath: string, scale: number) {
+    const image = sharp(inputPath);
+
+    // Get the original image's metadata (e.g., width and height)
+    const metadata = await image.metadata();
+
+    const width = metadata.width! * scale;
+    const height = metadata.height! * scale;
+
+    // Resize the image using nearest neighbor interpolation
+    const upscaledBuffer = await image
+        .resize(width, height, {
+            kernel: sharp.kernel.nearest, // Use nearest neighbor interpolation
+        })
+        .toBuffer(); // Save the upscaled image
+
+    return upscaledBuffer;
 }
 
 function unzipFile(zipFilePath: string, outputDir: string) {
