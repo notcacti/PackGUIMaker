@@ -9,8 +9,10 @@ if (!fs.existsSync(tempPath)) {
     fs.mkdirSync(tempPath);
 }
 
-const packFileName = "64x";
-const xpNotFullValPercent = 45 / 100; // DON'T USE 100% IT WILL 100% BREAK
+const packFileName = "pack";
+const xpNotFullValPercent = 69 / 100; // DON'T USE 100% IT WILL 100% BREAK
+const upscale = true;
+const upscaleRate = 10;
 
 const packPath = path.join(process.cwd(), "__mocks__", `${packFileName}.zip`);
 const packSavePath = path.join(tempPath, packFileName);
@@ -340,7 +342,11 @@ async function combineParts(
 
         ctx.drawImage(lowerIcon, 0, 1);
         ctx.drawImage(upperIcon, lowerIcon.width, 1);
-        ctx.drawImage(selector, upperIcon.width - 2 * scalingFactor, 0);
+        ctx.drawImage(
+            selector,
+            upperIcon.width - 2 * scalingFactor,
+            (selector.height - lowerIcon.height) / 2
+        );
 
         const guiBuffer = canvas.toBuffer();
         fs.writeFileSync(outputPath, guiBuffer);
@@ -500,14 +506,21 @@ async function generateUI() {
 
     const uiBuffer = canvas.toBuffer();
 
-    fs.writeFileSync(savePaths.uiImg, uiBuffer);
+    let imgBuffer;
+    if (upscale) {
+        imgBuffer = await upscaleImage(uiBuffer, upscaleRate);
+    } else {
+        imgBuffer = uiBuffer;
+    }
+
+    fs.writeFileSync(savePaths.uiImg, imgBuffer!);
 
     console.log("COMPLETED PROCESS");
 }
 
 // shameless edited chatgpt code
-async function upscaleImage(inputPath: string, scale: number) {
-    const image = sharp(inputPath);
+async function upscaleImage(input: string | Buffer, scale: number) {
+    const image = sharp(input);
 
     // Get the original image's metadata (e.g., width and height)
     const metadata = await image.metadata();
