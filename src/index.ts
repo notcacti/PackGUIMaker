@@ -9,8 +9,8 @@ if (!fs.existsSync(tempPath)) {
     fs.mkdirSync(tempPath);
 }
 
-const packFileName = "pack";
-const xpNotFullValPercent = 69 / 100; // DON'T USE 100% IT WILL 100% BREAK
+const packFileName = "cell";
+const xpNotFullValPercent = 50 / 100; // DON'T USE 100% IT WILL 100% BREAK
 const upscale = true;
 const upscaleRate = 10;
 
@@ -105,20 +105,20 @@ const iconCoordinates: { [key: string]: Coordinates } = {
 
 const guiCoordinates: { [key: string]: Coordinates } = {
     firstTwoSlots: {
-        x: 0,
-        y: 0,
+        x: 1,
+        y: 1,
         width: 40 * scalingFactor,
-        height: 23 * scalingFactor,
+        height: 20 * scalingFactor,
     },
     lastSlot: {
-        x: 160 * scalingFactor,
-        y: 0,
-        width: 23 * scalingFactor,
-        height: 23 * scalingFactor,
+        x: 161 * scalingFactor,
+        y: 1,
+        width: 20 * scalingFactor,
+        height: 20 * scalingFactor,
     },
     selector: {
-        x: 2 * scalingFactor,
-        y: 22 * scalingFactor,
+        x: 1 * scalingFactor,
+        y: 23 * scalingFactor,
         width: 22 * scalingFactor,
         height: 22 * scalingFactor,
     },
@@ -342,11 +342,7 @@ async function combineParts(
 
         ctx.drawImage(lowerIcon, 0, 1);
         ctx.drawImage(upperIcon, lowerIcon.width, 1);
-        ctx.drawImage(
-            selector,
-            upperIcon.width - 2 * scalingFactor,
-            (selector.height - lowerIcon.height) / 2
-        );
+        ctx.drawImage(selector, upperIcon.width - 1, 0);
 
         const guiBuffer = canvas.toBuffer();
         fs.writeFileSync(outputPath, guiBuffer);
