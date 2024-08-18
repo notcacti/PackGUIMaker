@@ -3,31 +3,13 @@ import * as unzipper from "unzipper";
 import { createCanvas, Image, loadImage } from "canvas";
 import fs, { PathLike } from "fs";
 
-// Very useful thanks jezler
-/*
-    icons_crops = [
-        ((52, 0, 61, 9), 'full_heart'),      # Full Heart
-        ((61, 0, 67, 9), 'half_heart'),      # Half Heart
-        ((16, 9, 25, 18), 'armor_background'), # Armour Background
-        ((25, 9, 34, 18), 'half_armor'),     # Half Armour
-        ((34, 9, 43, 18), 'full_armor'),     # Full Armour
-        ((52, 9, 61, 18), 'heart_background'), # Heart Background
-        ((52, 27, 62, 36), 'full_hunger'),   # Full Hunger
-        ((62, 27, 70, 36), 'half_hunger'),   # Half Hunger
-        ((16, 27, 25, 36), 'hunger_background'), # Hunger Background
-        ((0, 64, 182, 69), 'xp_bar_background'), # XP bar background
-        ((0, 69, 182, 74), 'xp_bar')         # XP bar
-    ]
-*/
-
 const tempPath = path.join(process.cwd(), "temp");
 if (!fs.existsSync(tempPath)) {
     fs.mkdirSync(tempPath);
 }
 
-const packFileName = "16x";
-const xpNotFullValPercent = 50 / 100;
-let scalingFactor = 1;
+const packFileName = "64x";
+const xpNotFullValPercent = 45 / 100; // DON'T USE 100% IT WILL 100% BREAK
 
 const packPath = path.join(process.cwd(), "__mocks__", `${packFileName}.zip`);
 const packSavePath = path.join(tempPath, packFileName);
@@ -75,61 +57,169 @@ const savePaths = {
     uiImg: path.join(uiSavePath, `${packFileName}_ui.png`),
 };
 
-await getResolution();
+interface Coordinates {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+let res = await getResolution(iconsPath);
+let scalingFactor = res / 16;
+
+const iconCoordinates: { [key: string]: Coordinates } = {
+    hunger: {
+        x: 52 * scalingFactor,
+        y: 27 * scalingFactor,
+        width: 9 * scalingFactor,
+        height: 9 * scalingFactor,
+    },
+    hungerBg: {
+        x: 16 * scalingFactor,
+        y: 27 * scalingFactor,
+        width: 9 * scalingFactor,
+        height: 9 * scalingFactor,
+    },
+    heart: {
+        x: 52 * scalingFactor,
+        y: 0 * scalingFactor,
+        width: 9 * scalingFactor,
+        height: 9 * scalingFactor,
+    },
+    heartBg: {
+        x: 16 * scalingFactor,
+        y: 0 * scalingFactor,
+        width: 9 * scalingFactor,
+        height: 9 * scalingFactor,
+    },
+    armor: {
+        x: 34 * scalingFactor,
+        y: 9 * scalingFactor,
+        width: 9 * scalingFactor,
+        height: 9 * scalingFactor,
+    },
+};
+
+const guiCoordinates: { [key: string]: Coordinates } = {
+    firstTwoSlots: {
+        x: 0,
+        y: 0,
+        width: 40 * scalingFactor,
+        height: 23 * scalingFactor,
+    },
+    lastSlot: {
+        x: 160 * scalingFactor,
+        y: 0,
+        width: 23 * scalingFactor,
+        height: 23 * scalingFactor,
+    },
+    selector: {
+        x: 2 * scalingFactor,
+        y: 22 * scalingFactor,
+        width: 22 * scalingFactor,
+        height: 22 * scalingFactor,
+    },
+};
+
 await processGUI();
 await processIcons();
 await generateUI();
-// clean();
+clean();
 
-function getResolution() {}
+async function getResolution(spriteSheetPath: string) {
+    return ~~((await loadImage(spriteSheetPath)).height / 16);
+}
 
 async function processIcons() {
+    console.log("STARTED PROCESSING ICONS");
+
+    const guiImg = await loadImage(savePaths.gui);
+
+    const dynamicIconCoordinates = {
+        xpEmpty: {
+            x: 182 * scalingFactor - guiImg.width,
+            y: 64 * scalingFactor,
+            width: guiImg.width,
+            height: 5 * scalingFactor,
+        },
+        xp: {
+            x: 0 * scalingFactor,
+            y: 69 * scalingFactor,
+            width: guiImg.width * xpNotFullValPercent,
+            height: 5 * scalingFactor,
+        },
+    };
+
     /* ---- Hunger ---- */
-    await extractPart(iconsPath, savePaths.hunger, 52, 27, 9, 9, "HUNGER"); // Get Hunger
+    await extractPart(
+        iconsPath,
+        savePaths.hunger,
+        iconCoordinates.hunger.x,
+        iconCoordinates.hunger.y,
+        iconCoordinates.hunger.width,
+        iconCoordinates.hunger.height,
+        "HUNGER"
+    );
     await extractPart(
         iconsPath,
         savePaths.hungerBg,
-        16,
-        27,
-        9,
-        9,
+        iconCoordinates.hungerBg.x,
+        iconCoordinates.hungerBg.y,
+        iconCoordinates.hungerBg.width,
+        iconCoordinates.hungerBg.height,
         "HUNGER_BACKGROUND"
-    ); // Get Hunger Background
+    );
 
     /* ---- Hearts ---- */
-    await extractPart(iconsPath, savePaths.heart, 52, 0, 9, 9, "HEART"); // Get Heart
+    await extractPart(
+        iconsPath,
+        savePaths.heart,
+        iconCoordinates.heart.x,
+        iconCoordinates.heart.y,
+        iconCoordinates.heart.width,
+        iconCoordinates.heart.height,
+        "HEART"
+    );
     await extractPart(
         iconsPath,
         savePaths.heartBg,
-        16,
-        0,
-        9,
-        9,
+        iconCoordinates.heartBg.x,
+        iconCoordinates.heartBg.y,
+        iconCoordinates.heartBg.width,
+        iconCoordinates.heartBg.height,
         "HEART_BACKGROUND"
-    ); // Get Heart Background
+    );
 
-    /* ---- XP (NOTE: Total is 182px Wide and 5px High, Adjust Accordingly.) ---- */
-    const guiImg = await loadImage(savePaths.gui);
+    /* ---- XP ---- */
     await extractPart(
         iconsPath,
         savePaths.xpEmpty,
-        182 - guiImg.width,
-        64,
-        guiImg.width,
-        5,
+        dynamicIconCoordinates.xpEmpty.x,
+        dynamicIconCoordinates.xpEmpty.y,
+        dynamicIconCoordinates.xpEmpty.width,
+        dynamicIconCoordinates.xpEmpty.height,
         "XP_BAR_EMPTY"
-    ); // Get XP Background
+    );
     await extractPart(
         iconsPath,
         savePaths.xp,
-        0,
-        69,
-        guiImg.width * xpNotFullValPercent,
-        5,
+        dynamicIconCoordinates.xp.x,
+        dynamicIconCoordinates.xp.y,
+        dynamicIconCoordinates.xp.width,
+        dynamicIconCoordinates.xp.height,
         "XP_BAR"
-    ); // Get XP Bar
+    );
+
     /* ---- Armor ---- */
-    await extractPart(iconsPath, savePaths.armor, 34, 9, 9, 9, "ARMOR"); // Get Armor
+    await extractPart(
+        iconsPath,
+        savePaths.armor,
+        iconCoordinates.armor.x,
+        iconCoordinates.armor.y,
+        iconCoordinates.armor.width,
+        iconCoordinates.armor.height,
+        "ARMOR"
+    );
 
     /* Combining Specific Icons (Heart, Hunger, XP) */
     await combineParts(
@@ -147,37 +237,43 @@ async function processIcons() {
         savePaths.xp,
         "XP_BAR"
     );
+
+    console.log("FINISHED PROCESSING ICONS");
 }
 
 async function processGUI() {
+    console.log("STARTED PROCESSING WIDGETS");
+
+    /* ---- Extract Parts ---- */
     await extractPart(
         widgetsPath,
         savePaths.firstTwoSlots,
-        0,
-        0,
-        40,
-        23,
+        guiCoordinates.firstTwoSlots.x,
+        guiCoordinates.firstTwoSlots.y,
+        guiCoordinates.firstTwoSlots.width,
+        guiCoordinates.firstTwoSlots.height,
         "FIRST_TWO"
     );
     await extractPart(
         widgetsPath,
         savePaths.lastSlot,
-        160,
-        0,
-        23,
-        23,
+        guiCoordinates.lastSlot.x,
+        guiCoordinates.lastSlot.y,
+        guiCoordinates.lastSlot.width,
+        guiCoordinates.lastSlot.height,
         "LAST_SLOT"
     );
     await extractPart(
         widgetsPath,
         savePaths.selector,
-        1,
-        22,
-        22,
-        22,
+        guiCoordinates.selector.x,
+        guiCoordinates.selector.y,
+        guiCoordinates.selector.width,
+        guiCoordinates.selector.height,
         "SELECTOR"
     );
 
+    /* ---- Combine Parts ---- */
     await combineParts(
         {
             lowerIcon: savePaths.firstTwoSlots,
@@ -187,6 +283,8 @@ async function processGUI() {
         savePaths.gui,
         "GUI"
     );
+
+    console.log("FINISHED PROCESSING WIDGETS");
 }
 
 async function combineParts(
@@ -201,30 +299,23 @@ async function combineParts(
     const lowerIcon = await loadImage(iconPaths.lowerIcon.toString()); // first 2
     const upperIcon = await loadImage(iconPaths.upperIcon.toString()); // last one
 
+    // hardcoded in because i can't be asked to code it properly 🔥🔥🔥
     if (name === "GUI" && iconPaths.extraIcon) {
-        const firstTwoSlots = lowerIcon;
-        const lastSlot = upperIcon;
         const selector = await loadImage(iconPaths.extraIcon.toString()); // selector
 
         const canvas = createCanvas(
-            firstTwoSlots.width + lastSlot.width,
+            guiCoordinates.firstTwoSlots.width + guiCoordinates.lastSlot.width,
             selector.height
         );
         const ctx = canvas.getContext("2d");
 
-        ctx.drawImage(firstTwoSlots, 0, 1);
-        ctx.drawImage(lastSlot, firstTwoSlots.width, 1);
-        ctx.drawImage(selector, lastSlot.width - 2, 0);
+        ctx.drawImage(lowerIcon, 0, 1);
+        ctx.drawImage(upperIcon, lowerIcon.width, 1);
+        ctx.drawImage(selector, upperIcon.width - 2 * scalingFactor, 0);
 
         const guiBuffer = canvas.toBuffer();
         fs.writeFileSync(outputPath, guiBuffer);
     } else {
-        if (
-            lowerIcon.width !== upperIcon.width &&
-            lowerIcon.height !== upperIcon.height
-        )
-            return;
-
         let width = lowerIcon.width;
         let height = lowerIcon.height;
 
@@ -232,12 +323,16 @@ async function combineParts(
         const ctx = canvas.getContext("2d");
 
         ctx.drawImage(lowerIcon, 0, 0, width, height, 0, 0, width, height);
-        ctx.drawImage(upperIcon, 0, 0, width, height, 0, 0, width, height);
-
         if (name === "XP_BAR") {
-            ctx.clearRect(0, 0, 1, 1);
-            ctx.clearRect(0, height - 1, 1, 1);
+            ctx.clearRect(0, 0, scalingFactor, scalingFactor);
+            ctx.clearRect(
+                0,
+                height - scalingFactor,
+                scalingFactor,
+                scalingFactor
+            );
         }
+        ctx.drawImage(upperIcon, 0, 0, width, height, 0, 0, width, height);
 
         const combinedIconBuffer = canvas.toBuffer();
         fs.writeFileSync(outputPath, combinedIconBuffer);
@@ -279,63 +374,100 @@ async function extractPart(
     fs.writeFileSync(outputPath, iconBuffer);
 }
 
-function repeatIcon(image: Image) {
-    const canvas = createCanvas(image.width * 3, image.height);
+function repeatIcon(image: Image, times: number) {
+    const canvas = createCanvas(image.width * times, image.height);
     const context = canvas.getContext("2d");
 
-    context.drawImage(image, 0, 0);
-    context.drawImage(image, image.width, 0);
-    context.drawImage(image, image.width * 2, 0);
-
+    for (let i = 0; i <= times; i++) {
+        context.drawImage(image, image.width * i, 0);
+    }
     const repeatedIconBuffer = canvas.toBuffer();
 
     return repeatedIconBuffer;
 }
 
 async function generateUI() {
-    const heart = await loadImage(savePaths.heart);
-    const hunger = await loadImage(savePaths.hunger);
-    const armor = await loadImage(savePaths.armor);
-    const gui = await loadImage(savePaths.gui);
-    const xp = await loadImage(savePaths.xp);
+    console.log("GENERATING UI");
 
-    let heartImage = new Image();
-    heartImage.src = repeatIcon(heart);
+    type ImageKeys = "heart" | "hunger" | "armor" | "gui" | "xp";
 
-    let hungerImage = new Image();
-    hungerImage.src = repeatIcon(hunger);
+    const images: ImageKeys[] = ["heart", "hunger", "armor", "gui", "xp"];
+    const loadedImages: { [key in ImageKeys]?: Image } = {};
 
-    let armorImage = new Image();
-    armorImage.src = repeatIcon(armor);
+    for (const image of images) {
+        loadedImages[image] = await loadImage(savePaths[image]);
+    }
 
-    const canvas = createCanvas(
-        xp.width,
-        hunger.height + heart.height + xp.height + gui.height + 3
-    );
+    const repeatedImages: { [key in ImageKeys]?: Image } = {};
+    const repeatIcons: ImageKeys[] = ["heart", "hunger", "armor"];
+
+    for (const icon of repeatIcons) {
+        const repeatedImage = new Image();
+        repeatedImage.src = repeatIcon(loadedImages[icon]!, 3);
+        repeatedImages[icon] = repeatedImage;
+    }
+
+    const canvasHeight =
+        loadedImages.xp!.height +
+        repeatedImages.heart!.height +
+        loadedImages.gui!.height +
+        repeatedImages.armor!.height +
+        3;
+
+    const canvas = createCanvas(loadedImages.xp!.width, canvasHeight);
     const ctx = canvas.getContext("2d");
 
-    ctx.drawImage(gui, 0, canvas.height - gui.height);
-    ctx.drawImage(xp, 0, canvas.height - gui.height - xp.height - 1);
-    ctx.drawImage(
-        heartImage,
-        0,
-        canvas.height - gui.height - xp.height - heartImage.height - 2
-    );
-    ctx.drawImage(
-        hungerImage,
-        canvas.width - hungerImage.width,
-        canvas.height - gui.height - xp.height - heartImage.height - 2
-    );
-    ctx.drawImage(
-        armorImage,
-        0,
-        canvas.height -
-            gui.height -
-            xp.height -
-            heartImage.height -
-            armorImage.height -
-            3
-    );
+    const positions = [
+        {
+            image: loadedImages.gui!,
+            x: 0,
+            y: canvas.height - loadedImages.gui!.height,
+        },
+        {
+            image: loadedImages.xp!,
+            x: 0,
+            y:
+                canvas.height -
+                loadedImages.gui!.height -
+                loadedImages.xp!.height -
+                1,
+        },
+        {
+            image: repeatedImages.heart!,
+            x: 0,
+            y:
+                canvas.height -
+                loadedImages.gui!.height -
+                loadedImages.xp!.height -
+                repeatedImages.heart!.height -
+                2,
+        },
+        {
+            image: repeatedImages.hunger!,
+            x: canvas.width - repeatedImages.hunger!.width,
+            y:
+                canvas.height -
+                loadedImages.gui!.height -
+                loadedImages.xp!.height -
+                repeatedImages.heart!.height -
+                2,
+        },
+        {
+            image: repeatedImages.armor!,
+            x: 0,
+            y:
+                canvas.height -
+                loadedImages.gui!.height -
+                loadedImages.xp!.height -
+                repeatedImages.heart!.height -
+                repeatedImages.armor!.height -
+                3,
+        },
+    ];
+
+    for (const pos of positions) {
+        ctx.drawImage(pos.image, pos.x, pos.y);
+    }
 
     const uiBuffer = canvas.toBuffer();
 
