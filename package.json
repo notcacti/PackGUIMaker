@@ -1,29 +1,29 @@
 {
-  "name": "guimaker",
-  "version": "1.0.0",
-  "main": "./dist/index.js",
-  "scripts": {
-    "build": "rimraf ./dist/ && tsc",
-    "predev": "npm run build",
-    "dev": "tsc -w & nodemon ./dist/index.js",
-    "prestart": "npm run build",
-    "start": "node ./dist/index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "type": "module",
-  "devDependencies": {
-    "@types/node": "^22.3.0",
-    "nodemon": "^3.1.4",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.5.4"
-  },
-  "dependencies": {
-    "@types/unzipper": "^0.10.10",
-    "canvas": "^2.11.2",
-    "sharp": "^0.33.5",
-    "unzipper": "^0.12.3"
-  }
+    "name": "guimaker",
+    "version": "1.0.0",
+    "author": "",
+    "main": "./dist/index.js",
+    "description": "",
+    "keywords": [],
+    "license": "ISC",
+    "scripts": {
+        "build": "rimraf ./dist/ && tsc",
+        "predev": "npm run build",
+        "dev": "tsc -w & nodemon ./dist/index.js",
+        "prestart": "npm run build",
+        "start": "node ./dist/index.js"
+    },
+    "type": "module",
+    "dependencies": {
+        "canvas": "^2.11.2",
+        "sharp": "^0.33.5",
+        "unzipper": "^0.12.3"
+    },
+    "devDependencies": {
+        "@types/node": "^22.4.1",
+        "@types/unzipper": "^0.10.10",
+        "nodemon": "^3.1.4",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.5.4"
+    }
 }
