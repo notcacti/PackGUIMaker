@@ -9,26 +9,34 @@ if (!fs.existsSync(tempPath)) {
     fs.mkdirSync(tempPath);
 }
 
-const packFileName = "cell";
-const xpNotFullValPercent = 50 / 100; // DON'T USE 100% IT WILL 100% BREAK
+let packFile = "thing.mcpack";
+const xpNotFullValPercent = 51 / 100; // DON'T USE 100% IT WILL 100% BREAK
 const upscale = true;
 const upscaleRate = 10;
+let bedrockPack = false;
 
-const packPath = path.join(process.cwd(), "__mocks__", `${packFileName}.zip`);
-const packSavePath = path.join(tempPath, packFileName);
+let packPath = path.join(process.cwd(), "__mocks__", `${packFile}`);
+
+if (packPath.split(".").pop() === "mcpack") {
+    bedrockPack = true;
+}
+
+let packSavePath = path.join(tempPath, packFile);
 
 await unzipFile(packPath, packSavePath);
 
-const guiFolderPath = path.join(
-    packSavePath,
-    "assets",
-    "minecraft",
-    "textures",
-    "gui"
-);
+let subfiles = fs.readdirSync(packSavePath);
+
+if (subfiles.length <= 1) packSavePath = path.join(packSavePath, subfiles[0]);
+
+const guiFolderPath = !bedrockPack
+    ? path.join(packSavePath, "assets", "minecraft", "textures", "gui")
+    : path.join(packSavePath, "textures", "gui");
 
 const iconsPath = path.join(guiFolderPath, "icons.png");
-const widgetsPath = path.join(guiFolderPath, "widgets.png");
+const widgetsPath = bedrockPack
+    ? path.join(guiFolderPath, "gui.png")
+    : path.join(guiFolderPath, "widgets.png");
 
 const iconsSavePath = path.join(tempPath, "icons");
 if (!fs.existsSync(iconsSavePath)) {
@@ -57,7 +65,7 @@ const savePaths = {
     xpEmpty: path.join(iconsSavePath, "xpEmpty.png"),
     xp: path.join(iconsSavePath, "xp.png"),
     armor: path.join(iconsSavePath, "armor.png"),
-    uiImg: path.join(uiSavePath, `${packFileName}_ui.png`),
+    uiImg: path.join(uiSavePath, `${packFile}_ui.png`),
 };
 
 interface Coordinates {
