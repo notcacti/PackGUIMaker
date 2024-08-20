@@ -1,0 +1,189 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+body {
+    height: 100vh;
+    width: 100vw;
+    background-image: linear-gradient(to top, #0d7c66, #bde8ca);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-container {
+    width: 40vw;
+    min-height: 550px;
+    background-color: #eee;
+    border-radius: 30px;
+    outline: 5px solid #221;
+    box-shadow: 0 10px 0 5px #221, 0 0 100px 0 rgba(0, 0, 0, 20%);
+}
+
+.main-container #title {
+    font-family: "Poppins", sans-serif;
+    font-weight: 550;
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 0;
+    font-size: 40px;
+    color: #222;
+}
+
+.slider-container {
+    display: flex;
+    align-items: flex-start;
+    font-family: "Poppins", sans-serif;
+    flex-direction: column;
+    margin: 30px;
+    position: relative;
+    color: #333;
+}
+
+.slider-container label {
+    margin: 5px;
+    font-weight: 550;
+    font-size: 20px;
+}
+
+#upscale-slider,
+#xp-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 300px;
+    background: #ddd;
+    outline: none;
+    border: 1px solid #888;
+    height: 25px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#upscale-slider::-webkit-slider-runnable-track,
+#xp-slider::-webkit-slider-runnable-track {
+    height: 20px;
+    border-radius: 5px;
+    background: #ddd;
+}
+
+#upscale-slider::-webkit-slider-thumb,
+#xp-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ddd;
+    border: 1px solid #444;
+    cursor: pointer;
+    box-shadow: -407px 0 0 400px #444;
+    transition: background 0.3s ease-in-out;
+}
+
+#upscale-slider::-moz-range-track,
+#xp-slider::-moz-range-track {
+    height: 10px;
+    border-radius: 5px;
+    background: #ddd;
+}
+
+#upscale-slider::-moz-range-thumb,
+#xp-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ddd;
+    border: 1px solid #444;
+    cursor: pointer;
+    box-shadow: -407px 0 0 400px #444;
+    transition: background 0.3s ease-in-out;
+}
+
+#upscale-slider::-ms-track,
+#xp-slider::-ms-track {
+    height: 20px;
+    border-radius: 5px;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+#upscale-slider::-ms-thumb,
+#xp-slider::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #444;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    box-shadow: -407px 0 0 400px #444;
+    transition: background 0.3s ease-in-out;
+}
+
+.version-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    padding: 30px;
+    gap: 5px;
+}
+
+.version-buttons-container #bedrock,
+.version-buttons-container #java {
+    padding: 10px;
+    height: 25px;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    border-radius: 10px;
+    border: 3px solid #444;
+    color: #222;
+    font-family: "Montserrat", sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    box-shadow: 0 3px 0 0 #444;
+    transition: all 0.2s ease-in-out;
+}
+
+.version-buttons-container #bedrock:hover,
+.version-buttons-container #java:hover,
+.version-buttons-container .active {
+    background-color: #555;
+    color: white !important;
+    cursor: pointer;
+}
+
+.upload-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 45px;
+}
+
+.upload-button {
+    padding: 10px;
+    height: 30px;
+    min-width: 50%;
+    text-align: center;
+    margin: 0;
+    border-radius: 10px;
+    border: 3px solid #444;
+    color: #333;
+    font-family: "Montserrat", sans-serif;
+    font-size: 25px;
+    font-weight: 600;
+    box-shadow: 0 5px 0 0 #444;
+    transition: all 0.2s ease-in-out;
+}
+
+.upload-button:hover {
+    background-color: #555;
+    color: white;
+    cursor: pointer;
+}
+
+.upload-input {
+    display: none;
+}
