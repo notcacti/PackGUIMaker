@@ -4,139 +4,21 @@ import { createCanvas, Image, loadImage } from "canvas";
 import fs, { PathLike } from "fs";
 import sharp from "sharp";
 
-const tempPath = path.join(process.cwd(), "temp");
-if (!fs.existsSync(tempPath)) {
-    fs.mkdirSync(tempPath);
-}
+// TODO:
+// Fix this mess of "code".
 
-let packFile = "thing.mcpack";
-const xpNotFullValPercent = 51 / 100; // DON'T USE 100% IT WILL 100% BREAK
-const upscale = true;
-const upscaleRate = 10;
-let bedrockPack = false;
-
-let packPath = path.join(process.cwd(), "__mocks__", `${packFile}`);
-
-if (packPath.split(".").pop() === "mcpack") {
-    bedrockPack = true;
-}
-
-let packSavePath = path.join(tempPath, packFile);
-
-await unzipFile(packPath, packSavePath);
-
-let subfiles = fs.readdirSync(packSavePath);
-
-if (subfiles.length <= 1) packSavePath = path.join(packSavePath, subfiles[0]);
-
-const guiFolderPath = !bedrockPack
-    ? path.join(packSavePath, "assets", "minecraft", "textures", "gui")
-    : path.join(packSavePath, "textures", "gui");
-
-const iconsPath = path.join(guiFolderPath, "icons.png");
-const widgetsPath = bedrockPack
-    ? path.join(guiFolderPath, "gui.png")
-    : path.join(guiFolderPath, "widgets.png");
-
-const iconsSavePath = path.join(tempPath, "icons");
-if (!fs.existsSync(iconsSavePath)) {
-    fs.mkdirSync(iconsSavePath);
-}
-
-const widgetsSavePath = path.join(tempPath, "widgets");
-if (!fs.existsSync(widgetsSavePath)) {
-    fs.mkdirSync(widgetsSavePath);
-}
-
-const uiSavePath = path.join(process.cwd(), "UIs");
-if (!fs.existsSync(uiSavePath)) {
-    fs.mkdirSync(uiSavePath);
-}
-
-const savePaths = {
-    firstTwoSlots: path.join(widgetsSavePath, "firstTwoSlots.png"),
-    lastSlot: path.join(widgetsSavePath, "lastSlot.png"),
-    selector: path.join(widgetsSavePath, "selector.png"),
-    gui: path.join(widgetsSavePath, "gui.png"),
-    hunger: path.join(iconsSavePath, "hunger.png"),
-    hungerBg: path.join(iconsSavePath, "hungerBg.png"),
-    heart: path.join(iconsSavePath, "heart.png"),
-    heartBg: path.join(iconsSavePath, "heartBg.png"),
-    xpEmpty: path.join(iconsSavePath, "xpEmpty.png"),
-    xp: path.join(iconsSavePath, "xp.png"),
-    armor: path.join(iconsSavePath, "armor.png"),
-    uiImg: path.join(uiSavePath, `${packFile}_ui.png`),
-};
-
-interface Coordinates {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
-
-let res = await getResolution(iconsPath);
-let scalingFactor = res / 16;
-
-const iconCoordinates: { [key: string]: Coordinates } = {
-    hunger: {
-        x: 52 * scalingFactor,
-        y: 27 * scalingFactor,
-        width: 9 * scalingFactor,
-        height: 9 * scalingFactor,
-    },
-    hungerBg: {
-        x: 16 * scalingFactor,
-        y: 27 * scalingFactor,
-        width: 9 * scalingFactor,
-        height: 9 * scalingFactor,
-    },
-    heart: {
-        x: 52 * scalingFactor,
-        y: 0 * scalingFactor,
-        width: 9 * scalingFactor,
-        height: 9 * scalingFactor,
-    },
-    heartBg: {
-        x: 16 * scalingFactor,
-        y: 0 * scalingFactor,
-        width: 9 * scalingFactor,
-        height: 9 * scalingFactor,
-    },
-    armor: {
-        x: 34 * scalingFactor,
-        y: 9 * scalingFactor,
-        width: 9 * scalingFactor,
-        height: 9 * scalingFactor,
-    },
-};
-
-const guiCoordinates: { [key: string]: Coordinates } = {
-    firstTwoSlots: {
-        x: 1,
-        y: 1,
-        width: 40 * scalingFactor,
-        height: 20 * scalingFactor,
-    },
-    lastSlot: {
-        x: 161 * scalingFactor,
-        y: 1,
-        width: 20 * scalingFactor,
-        height: 20 * scalingFactor,
-    },
-    selector: {
-        x: 1 * scalingFactor,
-        y: 23 * scalingFactor,
-        width: 22 * scalingFactor,
-        height: 22 * scalingFactor,
-    },
-};
+async function main() {}
 
 await preProcessFixes();
 await processGUI();
 await processIcons();
 await generateUI();
 clean();
+
+function initializePaths() {
+    // get paths and init them (tempPath, iconsPath, etc)
+    // also unzip pack
+}
 
 async function preProcessFixes() {
     const widgetsDims = {
@@ -163,10 +45,6 @@ async function preProcessFixes() {
         );
         fs.writeFileSync(iconsPath, imageBuffer);
     }
-}
-
-async function getResolution(spriteSheetPath: string) {
-    return ~~((await loadImage(spriteSheetPath)).height / 16);
 }
 
 async function processIcons() {
@@ -326,105 +204,6 @@ async function processGUI() {
     console.log("FINISHED PROCESSING WIDGETS");
 }
 
-async function combineParts(
-    iconPaths: {
-        lowerIcon: PathLike;
-        upperIcon: PathLike;
-        extraIcon?: PathLike;
-    },
-    outputPath: PathLike,
-    name: string
-) {
-    const lowerIcon = await loadImage(iconPaths.lowerIcon.toString()); // first 2
-    const upperIcon = await loadImage(iconPaths.upperIcon.toString()); // last one
-
-    // hardcoded in because i can't be asked to code it properly 🔥🔥🔥
-    if (name === "GUI" && iconPaths.extraIcon) {
-        const selector = await loadImage(iconPaths.extraIcon.toString()); // selector
-
-        const canvas = createCanvas(
-            guiCoordinates.firstTwoSlots.width + guiCoordinates.lastSlot.width,
-            selector.height
-        );
-        const ctx = canvas.getContext("2d");
-
-        ctx.drawImage(lowerIcon, 0, 1);
-        ctx.drawImage(upperIcon, lowerIcon.width, 1);
-        ctx.drawImage(selector, upperIcon.width - 1, 0);
-
-        const guiBuffer = canvas.toBuffer();
-        fs.writeFileSync(outputPath, guiBuffer);
-    } else {
-        let width = lowerIcon.width;
-        let height = lowerIcon.height;
-
-        const canvas = createCanvas(width, height);
-        const ctx = canvas.getContext("2d");
-
-        ctx.drawImage(lowerIcon, 0, 0, width, height, 0, 0, width, height);
-        if (name === "XP_BAR") {
-            ctx.clearRect(0, 0, scalingFactor, scalingFactor);
-            ctx.clearRect(
-                0,
-                height - scalingFactor,
-                scalingFactor,
-                scalingFactor
-            );
-        }
-        ctx.drawImage(upperIcon, 0, 0, width, height, 0, 0, width, height);
-
-        const combinedIconBuffer = canvas.toBuffer();
-        fs.writeFileSync(outputPath, combinedIconBuffer);
-    }
-}
-
-async function extractPart(
-    spriteSheetPath: string,
-    outputPath: string,
-    x: number, // the x coordinate of the icon
-    y: number, // the y coordinate of the icon
-    width: number,
-    height: number,
-    name: string
-) {
-    const spriteImage = await loadImage(spriteSheetPath);
-    const spriteSize = {
-        width,
-        height,
-    };
-
-    const canvas = createCanvas(spriteSize.width, spriteSize.height);
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(
-        spriteImage,
-        x,
-        y,
-        spriteSize.width,
-        spriteSize.height,
-        0,
-        0,
-        spriteSize.width,
-        spriteSize.height
-    );
-
-    const iconBuffer = canvas.toBuffer("image/png");
-
-    fs.writeFileSync(outputPath, iconBuffer);
-}
-
-function repeatIcon(image: Image, times: number) {
-    const canvas = createCanvas(image.width * times, image.height);
-    const context = canvas.getContext("2d");
-
-    for (let i = 0; i <= times; i++) {
-        context.drawImage(image, image.width * i, 0);
-    }
-    const repeatedIconBuffer = canvas.toBuffer();
-
-    return repeatedIconBuffer;
-}
-
 async function generateUI() {
     console.log("GENERATING UI");
 
@@ -520,42 +299,4 @@ async function generateUI() {
     fs.writeFileSync(savePaths.uiImg, imgBuffer!);
 
     console.log("COMPLETED PROCESS");
-}
-
-// shameless edited chatgpt code
-async function upscaleImage(input: string | Buffer, scale: number) {
-    const image = sharp(input);
-
-    // Get the original image's metadata (e.g., width and height)
-    const metadata = await image.metadata();
-
-    const width = metadata.width! * scale;
-    const height = metadata.height! * scale;
-
-    // Resize the image using nearest neighbor interpolation
-    const upscaledBuffer = await image
-        .resize(width, height, {
-            kernel: sharp.kernel.nearest, // Use nearest neighbor interpolation
-        })
-        .toBuffer(); // Save the upscaled image
-
-    return upscaledBuffer;
-}
-
-function unzipFile(zipFilePath: string, outputDir: string) {
-    return new Promise<void>((resolve, reject) => {
-        fs.createReadStream(zipFilePath)
-            .pipe(unzipper.Extract({ path: outputDir }))
-            .on("close", () => {
-                resolve();
-            })
-            .on("error", (err) => {
-                console.error("Error during unzip:", err);
-                reject();
-            });
-    });
-}
-
-function clean() {
-    fs.rmSync(path.join(tempPath), { recursive: true, force: true });
 }
