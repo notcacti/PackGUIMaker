@@ -26,20 +26,37 @@ function updateXpSliderValue(value) {
 
 document.addEventListener("DOMContentLoaded", () => {
     updateUpscaleValue(document.getElementById("upscale-slider").value);
+
+    document.querySelectorAll(".version-button").forEach(button => {
+        button.addEventListener("click", function() {
+            //remove active class from all buttons
+            document.querySelectorAll(".version-button").forEach(btn => btn.classList.remove("active"));
+
+            //add active class to the clicked button
+            this.classList.add("active");
+
+            //update the version based on the clicked button
+            version = parseInt(this.getAttribute("data-version"));
+        });
+    });
 });
 
 function setVersion(value) {
-    document
-        .querySelectorAll(".version-buttons-container div")
-        .forEach((div) => {
-            div.classList.remove("active");
-        });
+    //remove active class from all buttons
+    document.querySelectorAll(".version-button").forEach((button) => {
+        button.classList.remove("active");
+    });
 
-    const clickedDiv =
-        value === 1
-            ? document.getElementById("bedrock")
-            : document.getElementById("java");
-    clickedDiv.classList.add("active");
+    // add active class to the specific button based on the version
+    const clickedButton = document.querySelector(`.version-button[data-version="${value}"]`);
+    if (clickedButton) {
+        clickedButton.classList.add("active");
+    }
 
     version = value;
 }
+
+document.getElementById('file-upload-button').addEventListener('click', function() {
+    document.getElementById('file-upload').click();
+});
+
