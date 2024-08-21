@@ -28,25 +28,25 @@
     <div class="slider-container">
         <label for="upscale-slider">Upscale Multiplier</label>
         <div class="inputs">
-            <input
-                    type="range"
-                    id="upscale-slider"
-                    min="1"
-                    max="10"
-                    value="1"
-                    step="1"
-                    oninput="updateUpscaleValue(this.value)"
-            />
+            <div class="slider-wrapper">
+                <input
+                        type="range"
+                        id="upscale-slider"
+                        min="1"
+                        max="10"
+                        value="1"
+                        step="0.1"
+                />
+            </div>
             <input
                     type="number"
                     id="upscale-input"
                     min="1"
                     max="10"
                     value="1"
-                    step="1"
-                    oninput="updateSliderValue(this.value)"
+                    step="0.1"
             />
-            <span>x</span>
+            <span class="unit">x</span>
         </div>
 
         <label for="xp-slider">XP Bar Filled %</label>
