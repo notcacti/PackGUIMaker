@@ -15,7 +15,7 @@
     },
     "type": "module",
     "dependencies": {
-        "canvas": "^2.11.2",
+        "@napi-rs/canvas": "^0.1.54",
         "sharp": "^0.33.5",
         "unzipper": "^0.12.3"
     },

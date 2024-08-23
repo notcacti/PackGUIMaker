@@ -1,11 +1,9 @@
 import path from "path";
-import * as unzipper from "unzipper";
-import { createCanvas, Image, loadImage } from "canvas";
-import fs, { PathLike } from "fs";
-import sharp from "sharp";
+import { createCanvas, Image, loadImage } from "@napi-rs/canvas";
+import fs from "fs";
+import { createConfig } from "./utils/configUtils.js";
 
-// TODO:
-// Fix this mess of "code".
+export const configPath = path.join(process.cwd(), "config.json");
 
 async function main() {}
 
@@ -18,6 +16,7 @@ clean();
 function initializePaths() {
     // get paths and init them (tempPath, iconsPath, etc)
     // also unzip pack
+    createConfig();
 }
 
 async function preProcessFixes() {

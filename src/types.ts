@@ -13,8 +13,8 @@ type IIconCoordinates = {
     heart: _ICoordinates;
     heartBg: _ICoordinates;
     armor: _ICoordinates;
-    xp?: _ICoordinates;
-    xpEmpty?: _ICoordinates;
+    xp: _ICoordinates;
+    xpEmpty: _ICoordinates;
 };
 
 type IGUICoordinates = {
@@ -52,10 +52,11 @@ type ISysPaths = {
     tempPath: string;
     packFolder: string;
     packGuiFolder: string;
-    packIconsFolder: string;
+    packIconsPath: string;
     packWidgetsPath: string;
     tempIconsPath: string;
     tempWidgetsPath: string;
+    configPath: string;
     // Remove while developing app.
     uiSavePath: string;
 };
@@ -69,3 +70,15 @@ export type IPaths<T extends IPathType> = T extends "ICON"
     : T extends "SYS"
     ? ISysPaths
     : never;
+
+export type IConfig = {
+    packFileName: string;
+    scalingFactor: number;
+    bedrock: boolean;
+    xpPercent: number;
+};
+
+export type IIconInfo = {
+    path: string;
+    destCoordinates: _ICoordinates;
+};

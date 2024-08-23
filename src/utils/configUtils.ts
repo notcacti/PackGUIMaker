@@ -1,17 +1,11 @@
 import fs from "fs";
-import path from "path";
-
-let configPath: string | null = null;
+import { IConfig } from "../types.js";
+import { configPath } from "../index.js";
 
 // Path to "temp" folder
 // returns path to the config file.
-export function createConfig(tempPath: string) {
-    if (!fs.existsSync(tempPath))
-        throw new Error("Path does not exist: " + tempPath);
-    if (!fs.lstatSync(tempPath).isDirectory())
-        throw new Error("Path is not a directory: " + tempPath);
-
-    configPath = path.join(tempPath, "config.json");
+export function createConfig() {
+    if (fs.existsSync(configPath)) fs.rmSync(configPath);
 
     try {
         fs.writeFileSync(configPath, JSON.stringify({}));
@@ -23,11 +17,8 @@ export function createConfig(tempPath: string) {
 }
 
 // returns config.json's contents
-export function getConfig() {
-    if (!configPath)
-        throw new Error(
-            "NOTINIT Configuration has not been initialized. Call createConfig() first."
-        );
+export function getConfig(): IConfig {
+    if (!configPath) return null;
     if (!fs.existsSync(configPath))
         throw new Error("Path does not exist: " + configPath);
     if (!fs.lstatSync(configPath).isFile())
@@ -42,11 +33,8 @@ export function setValue(
     key: string,
     value: string,
     mode: "insert" | "modify" = "insert"
-) {
-    if (!configPath)
-        throw new Error(
-            "NOTINIT Configuration has not been initialized. Call createConfig() first."
-        );
+): void | null {
+    if (!configPath) return null;
     if (!fs.existsSync(configPath))
         throw new Error("Path does not exist: " + configPath);
     if (!fs.lstatSync(configPath).isFile())
@@ -71,13 +59,12 @@ export function setValue(
     } catch (err) {
         throw new Error("Failed to set value: " + err);
     }
+
+    return;
 }
 
-export function deleteValue(key: string) {
-    if (!configPath)
-        throw new Error(
-            "NOTINIT Configuration has not been initialized. Call createConfig() first."
-        );
+export function deleteValue(key: string): void | null {
+    if (!configPath) return null;
     if (!fs.existsSync(configPath))
         throw new Error("Path does not exist: " + configPath);
     if (!fs.lstatSync(configPath).isFile())
@@ -87,7 +74,7 @@ export function deleteValue(key: string) {
         throw new Error("Invalid Parameters!");
     }
 
-    let configJson: Record<string, string> = JSON.parse(
+    let configJson: Record<string, any> = JSON.parse(
         fs.readFileSync(configPath).toString()
     );
 
@@ -102,4 +89,6 @@ export function deleteValue(key: string) {
     } catch (err) {
         throw new Error("Failed to delete value: " + err);
     }
+
+    return;
 }

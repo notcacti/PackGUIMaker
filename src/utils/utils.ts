@@ -1,28 +1,7 @@
-import sharp from "sharp";
 import fs from "fs";
 import unzipper from "unzipper";
 import path from "path";
-import { loadImage } from "canvas";
-
-export async function upscaleImage(input: string | Buffer, scale: number) {
-    const image = sharp(input);
-    if (image.errored) {
-        throw image.errored;
-    }
-
-    const metadata = await image.metadata();
-
-    const width = metadata.width! * scale;
-    const height = metadata.height! * scale;
-
-    const upscaledBuffer = await image
-        .resize(width, height, {
-            kernel: sharp.kernel.nearest,
-        })
-        .toBuffer();
-
-    return upscaledBuffer;
-}
+import { loadImage } from "@napi-rs/canvas";
 
 export function unzipFile(zipFilePath: string, outputDir: string) {
     return new Promise<void | Error>((resolve, reject) => {
