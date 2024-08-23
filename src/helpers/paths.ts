@@ -92,3 +92,7 @@ function getConfigValues() {
         return undefined;
     }
 }
+
+// TODO:
+// Initiate Paths
+// Create all the directories mentioned in getPaths();

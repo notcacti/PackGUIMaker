@@ -16,9 +16,13 @@ export function unzipFile(zipFilePath: string, outputDir: string) {
     });
 }
 
-export function clean(tempPath: string) {
-    if (!fs.existsSync(tempPath)) return;
-    fs.rmSync(path.join(tempPath), { recursive: true, force: true });
+export function clean(paths: string[]) {
+    for (const pth in paths) {
+        if (!fs.existsSync(pth)) continue;
+        fs.rmSync(pth, { recursive: true, force: true });
+    }
+
+    return;
 }
 
 export async function getScale(spriteSheetPath: string) {

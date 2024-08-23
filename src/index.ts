@@ -16,7 +16,7 @@ clean();
 function initializePaths() {
     // get paths and init them (tempPath, iconsPath, etc)
     // also unzip pack
-    createConfig();
+    // check paths.ts last line
 }
 
 async function preProcessFixes() {
