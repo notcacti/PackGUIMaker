@@ -2,6 +2,7 @@ import path from "path";
 import { IPaths, IPathType } from "../types.js";
 import { getConfig } from "../utils/configUtils.js";
 import { configPath } from "../index.js";
+import { checkAndMkdir } from "../utils/utils.js";
 
 export function getPaths<T extends IPathType>(type: T): IPaths<T> {
     const configValues = getConfigValues();
@@ -10,10 +11,10 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         process.exit(1);
     }
 
-    const { bedrock, packFileName } = configValues;
+    let { bedrock, packFileName } = configValues;
 
     const tempPath = path.join(process.cwd(), "temp");
-    let packSavePath = path.join(tempPath, packFileName);
+    let packSavePath = path.join(tempPath, packFileName ?? "pack");
 
     const guiFolderPath = bedrock
         ? path.join(packSavePath, "textures", "gui")
@@ -25,6 +26,9 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
 
     const iconsSavePath = path.join(tempPath, "icons");
     const widgetsSavePath = path.join(tempPath, "widgets");
+
+    const processedIcons = path.join(tempPath, "processedIcons.png");
+    const processedWidgets = path.join(tempPath, "processedWidgets.png");
 
     // Remove while developing app.
     const uiSavePath = path.join(process.cwd(), "UIs");
@@ -40,9 +44,13 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         tempIconsPath: iconsSavePath,
         tempWidgetsPath: widgetsSavePath,
         configPath: _configPath,
+        processedIconsPath: processedIcons,
+        processedWidgetsPath: processedWidgets,
         // Remove while developing app.
         uiSavePath: uiSavePath,
     };
+
+    if (type === "SYS") return sysPaths as IPaths<T>;
 
     const iconsPaths: IPaths<"ICON"> = {
         hunger: path.join(iconsSavePath, "hunger.png"),
@@ -54,6 +62,8 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         armor: path.join(iconsSavePath, "armor.png"),
     };
 
+    if (type === "ICON") return iconsPaths as IPaths<T>;
+
     const guiPaths: IPaths<"GUI"> = {
         twoSlots: path.join(widgetsSavePath, "firstTwoSlots.png"),
         lastSlot: path.join(widgetsSavePath, "lastSlot.png"),
@@ -64,16 +74,9 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         uiImg: path.join(uiSavePath, `${packFileName}_ui.png`),
     };
 
-    switch (type) {
-        case "SYS":
-            return sysPaths as IPaths<T>;
-        case "ICON":
-            return iconsPaths as IPaths<T>;
-        case "GUI":
-            return guiPaths as IPaths<T>;
-        default:
-            throw new Error(`Invalid type: ${type}`);
-    }
+    if (type === "GUI") return guiPaths as IPaths<T>;
+
+    throw new Error(`Invalid type: ${type}`);
 }
 
 // This function checks if the "bedrock" && "packFileName" already exists in the config.
@@ -93,6 +96,14 @@ function getConfigValues() {
     }
 }
 
-// TODO:
-// Initiate Paths
 // Create all the directories mentioned in getPaths();
+export function initializePaths(paths: IPaths<"SYS">) {
+    for (const path in paths) {
+        if (!path) continue;
+        try {
+            checkAndMkdir(path);
+        } catch (err) {
+            console.error("Error while initialising paths: " + err);
+        }
+    }
+}

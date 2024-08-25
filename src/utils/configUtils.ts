@@ -31,7 +31,7 @@ export function getConfig(): IConfig {
 
 export function setValue(
     key: string,
-    value: string,
+    value: any,
     mode: "insert" | "modify" = "insert"
 ): void | null {
     if (!configPath) return null;
@@ -44,11 +44,11 @@ export function setValue(
 
     if (mode === "insert" && key in configJson) {
         throw new Error(
-            `Key "${key}" already exists. Use modifyValue to update it.`
+            `Key "${key}" already exists. Use "modify" mode to update it.`
         );
     } else if (mode === "modify" && !(key in configJson)) {
         throw new Error(
-            `Key "${key}" does not exist. Use insertValue to add it.`
+            `Key "${key}" does not exist. Use "insert" mode to add it.`
         );
     }
 

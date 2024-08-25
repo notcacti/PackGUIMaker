@@ -1,5 +1,10 @@
 export type ICoordinatesType = "ICON" | "GUI";
 
+// export type ISimpleCoordinates = {
+//     x: number;
+//     y: number;
+// };
+
 type _ICoordinates = {
     x: number;
     y: number;
@@ -57,6 +62,8 @@ type ISysPaths = {
     tempIconsPath: string;
     tempWidgetsPath: string;
     configPath: string;
+    processedIconsPath: string;
+    processedWidgetsPath: string;
     // Remove while developing app.
     uiSavePath: string;
 };
@@ -76,6 +83,7 @@ export type IConfig = {
     scalingFactor: number;
     bedrock: boolean;
     xpPercent: number;
+    upscaleRate: number;
 };
 
 export type IIconInfo = {

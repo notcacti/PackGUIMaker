@@ -38,16 +38,15 @@ export async function getScale(spriteSheetPath: string) {
     returns an error if the path provided is not a folder or doesn't exist.
 */
 export function checkAndMkdir(folderPath: string) {
-    if (!fs.existsSync(folderPath))
-        throw new Error("Path does not exist: " + folderPath);
-    if (!fs.lstatSync(folderPath).isDirectory())
-        throw new Error("Path is not a directory: " + folderPath);
+    if (fs.existsSync(folderPath)) return;
 
     try {
         fs.mkdirSync(folderPath);
     } catch (err) {
         throw new Error("Error while creating directory: " + err);
     }
+
+    return;
 }
 
 // Only give the unzipped folder path.

@@ -94,6 +94,105 @@ export function getCoordinates<T extends ICoordinatesType>(
     }
 }
 
+export function getDestinationCoordinates<T extends ICoordinatesType>(
+    totalHeight: number,
+    type: T
+): ICoordinates<T> {
+    const configValues = getConfigValues();
+    if (!configValues) {
+        console.error("Couldn't fetch config - coordinates. Terminating.");
+        process.exit(1);
+    }
+
+    const { scalingFactor, xpPercent } = configValues;
+
+    const twoSlots = {
+        x: 0,
+        y: totalHeight - 20 * scalingFactor - 1 * scalingFactor,
+        width: 40 * scalingFactor,
+        height: 20 * scalingFactor,
+    };
+
+    const lastSlot = {
+        x: twoSlots.width,
+        y: totalHeight - 20 * scalingFactor - 1 * scalingFactor,
+        width: 20 * scalingFactor,
+        height: 20 * scalingFactor,
+    };
+
+    const selector = {
+        x: twoSlots.width - 1 * scalingFactor,
+        y: totalHeight - 22 * scalingFactor,
+        width: 22 * scalingFactor,
+        height: 22 * scalingFactor,
+    };
+
+    const guiCoordinates: ICoordinates<"GUI"> = {
+        twoSlots,
+        lastSlot,
+        selector,
+    };
+
+    if (type === "GUI") return guiCoordinates as ICoordinates<T>;
+
+    const guiWidth =
+        guiCoordinates.twoSlots.width + guiCoordinates.lastSlot.width;
+
+    const xpEmpty = {
+        x: 0,
+        y: 0,
+        width: guiWidth,
+        height: 5 * scalingFactor,
+    };
+
+    const xp = {
+        x: 0,
+        y: 0,
+        width: guiWidth * xpPercent,
+        height: 5 * scalingFactor,
+    };
+
+    // If heart.KEY is used it is for the general icon dims.
+    const heart = {
+        x: 0,
+        y: xp.height - 9 * scalingFactor - 1 * scalingFactor,
+        width: 9 * scalingFactor * 3,
+        height: 9 * scalingFactor,
+    };
+
+    const heartBg = heart; // since heart is 1px extended each direction anyways. this will adjust properly.
+
+    const hunger = {
+        x: guiWidth - heart.width,
+        y: heart.y,
+        width: 9 * scalingFactor * 3,
+        height: 9 * scalingFactor,
+    }; // y = heart.y as they're on the same level
+
+    const hungerBg = hunger; // same reason as above.
+
+    const armor = {
+        x: 0,
+        y: heart.y - 1 * scalingFactor,
+        width: 9 * scalingFactor * 3,
+        height: 9 * scalingFactor,
+    };
+
+    const iconCoordinates: ICoordinates<"ICON"> = {
+        hunger,
+        hungerBg,
+        heart,
+        heartBg,
+        armor,
+        xpEmpty,
+        xp,
+    };
+
+    if (type === "ICON") return iconCoordinates as ICoordinates<T>;
+
+    throw new Error("Invalid Type!");
+}
+
 function getConfigValues() {
     try {
         const config = getConfig();

@@ -52,8 +52,8 @@ export async function combineIcons(icons: IIconInfo[], outputPath: string) {
             image,
             icon.destCoordinates.x,
             icon.destCoordinates.y,
-            icon.destCoordinates.width,
-            icon.destCoordinates.height
+            image.width,
+            image.height
         );
     }
 
@@ -102,7 +102,13 @@ export function cropIcon(
     return;
 }
 
-export function repeatIcon(image: Image, times: number) {
+export async function repeatIcon(
+    imagePath: string,
+    times: number,
+    outputPath: string
+) {
+    const image = await loadImage(imagePath);
+
     const canvas = createCanvas(image.width * times, image.height);
     const context = canvas.getContext("2d");
 
@@ -111,5 +117,16 @@ export function repeatIcon(image: Image, times: number) {
     }
     const repeatedIconBuffer = canvas.toBuffer("image/png");
 
-    return repeatedIconBuffer;
+    savePngBuffer(repeatedIconBuffer, outputPath);
+
+    return;
+}
+
+export function savePngBuffer(buffer: Buffer, outputPath: string) {
+    try {
+        fs.writeFileSync(buffer, outputPath);
+    } catch (err) {
+        console.error("Error while saving PNG buffer: " + err);
+        return;
+    }
 }
