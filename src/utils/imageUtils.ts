@@ -3,6 +3,7 @@ import fs from "fs";
 import sharp from "sharp";
 import { IIconInfo } from "../types.js";
 
+// Returns the buffer of the upscaled png.
 export async function upscaleImage(input: string | Buffer, scale: number) {
     const image = sharp(input);
     if (image.errored) {
@@ -40,7 +41,8 @@ function calculateCanvasSize(icons: IIconInfo[]): {
     return { width: maxWidth, height: maxHeight };
 }
 
-export async function combineIcons(icons: IIconInfo[], outputPath: string) {
+// returns the whole canvas.
+export async function combineIcons(icons: IIconInfo[]) {
     const { width, height } = calculateCanvasSize(icons);
 
     const canvas = createCanvas(width, height);
@@ -57,8 +59,7 @@ export async function combineIcons(icons: IIconInfo[], outputPath: string) {
         );
     }
 
-    fs.writeFileSync(outputPath, canvas.toBuffer("image/png"));
-    return;
+    return canvas;
 }
 
 export function cropIcon(
@@ -93,7 +94,7 @@ export function cropIcon(
 
             const iconBuffer = canvas.toBuffer("image/png");
 
-            fs.writeFileSync(outputPath, iconBuffer);
+            savePngBuffer(iconBuffer, outputPath);
         })
         .catch((err) => {
             throw new Error("Error while cropping image: " + err);
@@ -102,11 +103,7 @@ export function cropIcon(
     return;
 }
 
-export async function repeatIcon(
-    imagePath: string,
-    times: number,
-    outputPath: string
-) {
+export async function repeatIcon(imagePath: string | Buffer, times: number) {
     const image = await loadImage(imagePath);
 
     const canvas = createCanvas(image.width * times, image.height);
@@ -117,14 +114,12 @@ export async function repeatIcon(
     }
     const repeatedIconBuffer = canvas.toBuffer("image/png");
 
-    savePngBuffer(repeatedIconBuffer, outputPath);
-
-    return;
+    return repeatedIconBuffer;
 }
 
 export function savePngBuffer(buffer: Buffer, outputPath: string) {
     try {
-        fs.writeFileSync(buffer, outputPath);
+        fs.writeFileSync(outputPath, buffer);
     } catch (err) {
         console.error("Error while saving PNG buffer: " + err);
         return;

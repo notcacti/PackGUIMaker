@@ -62,8 +62,6 @@ type ISysPaths = {
     tempIconsPath: string;
     tempWidgetsPath: string;
     configPath: string;
-    processedIconsPath: string;
-    processedWidgetsPath: string;
     // Remove while developing app.
     uiSavePath: string;
 };
@@ -87,6 +85,7 @@ export type IConfig = {
 };
 
 export type IIconInfo = {
-    path: string;
+    name: string;
+    path: string | Buffer;
     destCoordinates: _ICoordinates;
 };

@@ -95,7 +95,6 @@ export function getCoordinates<T extends ICoordinatesType>(
 }
 
 export function getDestinationCoordinates<T extends ICoordinatesType>(
-    totalHeight: number,
     type: T
 ): ICoordinates<T> {
     const configValues = getConfigValues();
@@ -106,23 +105,36 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
 
     const { scalingFactor, xpPercent } = configValues;
 
+    // Define heights for each element
+    const guiElementHeight = 22 * scalingFactor;
+    const iconElementHeight = 9 * scalingFactor;
+    const xpBarHeight = 5 * scalingFactor;
+
+    // Calculate the total height based on the elements involved
+    const canvasHeight = guiElementHeight + iconElementHeight + xpBarHeight;
+
+    // Calculate y positions relative to the bottom of the canvas (check prev commit(416e8d2) to see how it was handled before)
+    const bottomOffset = (offset: number) =>
+        canvasHeight - offset * scalingFactor;
+
+    // GUI coordinates
     const twoSlots = {
         x: 0,
-        y: totalHeight - 20 * scalingFactor - 1 * scalingFactor,
+        y: bottomOffset(20 + 1), // offset for y-position based on scalingFactor (20px for it's height and 1px to center it)
         width: 40 * scalingFactor,
         height: 20 * scalingFactor,
     };
 
     const lastSlot = {
         x: twoSlots.width,
-        y: totalHeight - 20 * scalingFactor - 1 * scalingFactor,
+        y: bottomOffset(20 + 1), // same y-position as twoSlots
         width: 20 * scalingFactor,
         height: 20 * scalingFactor,
     };
 
     const selector = {
-        x: twoSlots.width - 1 * scalingFactor,
-        y: totalHeight - 22 * scalingFactor,
+        x: twoSlots.width - scalingFactor,
+        y: bottomOffset(22), // slightly above twoSlots and lastSlot (this is where the 2px from those balance)
         width: 22 * scalingFactor,
         height: 22 * scalingFactor,
     };
@@ -133,8 +145,11 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
         selector,
     };
 
-    if (type === "GUI") return guiCoordinates as ICoordinates<T>;
+    if (type === "GUI") {
+        return guiCoordinates as ICoordinates<T>;
+    }
 
+    // ICON coordinates
     const guiWidth =
         guiCoordinates.twoSlots.width + guiCoordinates.lastSlot.width;
 
@@ -142,40 +157,41 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
         x: 0,
         y: 0,
         width: guiWidth,
-        height: 5 * scalingFactor,
+        height: xpBarHeight,
     };
 
     const xp = {
         x: 0,
         y: 0,
         width: guiWidth * xpPercent,
-        height: 5 * scalingFactor,
+        height: xpBarHeight,
     };
 
-    // If heart.KEY is used it is for the general icon dims.
-    const heart = {
+    const heartBase = {
         x: 0,
-        y: xp.height - 9 * scalingFactor - 1 * scalingFactor,
-        width: 9 * scalingFactor * 3,
-        height: 9 * scalingFactor,
+        y: xp.height - iconElementHeight - scalingFactor,
+        width: 27 * scalingFactor, // 9 * scalingFactor * 3
+        height: iconElementHeight,
     };
 
-    const heartBg = heart; // since heart is 1px extended each direction anyways. this will adjust properly.
+    const heart = { ...heartBase };
+    const heartBg = { ...heartBase };
 
-    const hunger = {
-        x: guiWidth - heart.width,
-        y: heart.y,
-        width: 9 * scalingFactor * 3,
-        height: 9 * scalingFactor,
-    }; // y = heart.y as they're on the same level
+    const hungerBase = {
+        x: guiWidth - heartBase.width,
+        y: heartBase.y,
+        width: heartBase.width,
+        height: heartBase.height,
+    };
 
-    const hungerBg = hunger; // same reason as above.
+    const hunger = { ...hungerBase };
+    const hungerBg = { ...hungerBase };
 
     const armor = {
         x: 0,
-        y: heart.y - 1 * scalingFactor,
-        width: 9 * scalingFactor * 3,
-        height: 9 * scalingFactor,
+        y: heartBase.y - scalingFactor,
+        width: heartBase.width,
+        height: heartBase.height,
     };
 
     const iconCoordinates: ICoordinates<"ICON"> = {
@@ -188,7 +204,9 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
         xp,
     };
 
-    if (type === "ICON") return iconCoordinates as ICoordinates<T>;
+    if (type === "ICON") {
+        return iconCoordinates as ICoordinates<T>;
+    }
 
     throw new Error("Invalid Type!");
 }

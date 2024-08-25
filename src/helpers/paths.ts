@@ -27,9 +27,6 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
     const iconsSavePath = path.join(tempPath, "icons");
     const widgetsSavePath = path.join(tempPath, "widgets");
 
-    const processedIcons = path.join(tempPath, "processedIcons.png");
-    const processedWidgets = path.join(tempPath, "processedWidgets.png");
-
     // Remove while developing app.
     const uiSavePath = path.join(process.cwd(), "UIs");
 
@@ -44,8 +41,6 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         tempIconsPath: iconsSavePath,
         tempWidgetsPath: widgetsSavePath,
         configPath: _configPath,
-        processedIconsPath: processedIcons,
-        processedWidgetsPath: processedWidgets,
         // Remove while developing app.
         uiSavePath: uiSavePath,
     };
