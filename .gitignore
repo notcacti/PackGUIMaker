@@ -5,3 +5,4 @@ __mocks__/
 temp/
 UIs/
 config.json
+*_ui.png

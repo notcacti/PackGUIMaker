@@ -9,7 +9,8 @@
         "strict": true,
         "strictPropertyInitialization": false,
         "strictNullChecks": false,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "sourceMap": true
     },
     "include": ["src/**/*"]
 }

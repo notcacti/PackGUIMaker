@@ -1,98 +1,40 @@
-import { configPath, createConfig, setValue } from "./utils/configUtils.js";
-import { getPaths, initializePaths } from "./helpers/paths.js";
-import {
-    checkBedrock,
-    clean,
-    convertBedrock,
-    getScale,
-    unzipFile,
-} from "./utils/utils.js";
-import path from "path";
-import { crop, imageDimsFix, processImage } from "./helpers/imageProcessing.js";
-import { savePngBuffer } from "./utils/imageUtils.js";
+import ps from "prompt-sync";
+import fs from "fs";
+import make from "./ui-maker.js";
 
-// packZipPath - path exactly to the pack zip file.
-// initialises paths and config
-async function initialize(
-    packZipPath: string,
-    upscaleRate: number,
-    xpPercent: number
-) {
-    createConfig(); // Initialize Config.
+const prompt = ps();
 
-    try {
-        // Pack Initialisation
-        const packFileName = packZipPath.split("/").pop();
-        setValue("packFileName", packFileName, "insert"); // Set the name in config.
-
-        const folderPaths = getPaths("SYS"); // Get Paths.
-
-        // Saves to folderPath.packFolder
-        await unzipFile(packZipPath, folderPaths.packFolder);
-
-        const bedrock = checkBedrock(folderPaths.packFolder);
-        if (bedrock) convertBedrock(folderPaths.packFolder);
-        setValue("bedrock", bedrock, "insert");
-
-        initializePaths(getPaths("SYS")); // Creates the folders from those paths. (Re-calling getPaths() because it will refresh the paths.)
-
-        const scalingFactor = await getScale(getPaths("SYS").packIconsPath);
-        setValue("scalingFactor", scalingFactor, "insert");
-
-        setValue("upscaleRate", upscaleRate, "insert");
-        setValue("xpPercent", xpPercent, "insert");
-    } catch (err) {
-        console.error("Error while initialising: " + err);
-        process.exit(1);
-    }
+const packPath = prompt(
+    "Drag your pack onto the window. (or) Paste its path here: "
+);
+if (!fs.existsSync(packPath)) {
+    console.log("Invalid Path!");
+    process.exit(1);
 }
 
-async function main() {
-    // Variables that would be auto-generated.
-    const packZipPath = path.join(process.cwd(), "__mocks__", "thing.mcpack");
-    const upscaleRate = 1;
-    const xpPercent = 50 / 100;
+let xpPercentPrompt = prompt(
+    "How much do you want the XP bar to be filled (in %)?\n(sometimes it won't work, try again if that happens): "
+);
 
-    // Initialise Config && Paths.
-    await initialize(packZipPath, upscaleRate, xpPercent);
+let xpPercent = parseInt(xpPercentPrompt);
+if (isNaN(xpPercent) || xpPercent < 1 || xpPercent > 100) {
+    console.log("Invalid XP fill value! It must be between 1 and 100.");
+    process.exit(1);
+}
 
-    // Get system paths for saving.
-    const systemPaths = getPaths("SYS");
+xpPercent = xpPercent / 100;
 
-    // Fix differing image sizes. (incase of any)
-    try {
-        await imageDimsFix(
-            systemPaths.packIconsPath,
-            systemPaths.packWidgetsPath
-        );
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
+const upscaleRate = parseInt(
+    prompt("How much upscaling do you want on the image (1 - 10): ")
+);
+if (isNaN(upscaleRate) || upscaleRate < 1 || upscaleRate > 10) {
+    console.log("Invalid upscaling rate! It must be between 1 and 10.");
+    process.exit(1);
+}
 
-    // Crop all the sprites from icons.png
-    await crop("ICON");
-    // Crop all the sprites from gui.png / widgets.png
-    await crop("GUI");
+(async () => {
+    const savePath = await make(packPath, upscaleRate, xpPercent);
 
-    // Process the whole image with the cutouts.
-    const uiImageBuffer = await processImage();
-
-    // Remove while developing app.
-    // replace with sending to their computer save dialog.
-    savePngBuffer(
-        uiImageBuffer,
-        path.join(
-            systemPaths.uiSavePath,
-            `${packZipPath.split("/").pop()}_ui.png`
-        )
-    );
-
-    // clean up extra files
-    clean([systemPaths.tempPath, configPath]);
-
-    /* ---- fin. ---- */
+    console.log(`Saved the generated UI at: ${savePath}`);
     process.exit(0);
-}
-
-main();
+})();

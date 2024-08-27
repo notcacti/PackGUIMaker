@@ -1,10 +1,5 @@
 export type ICoordinatesType = "ICON" | "GUI";
 
-// export type ISimpleCoordinates = {
-//     x: number;
-//     y: number;
-// };
-
 type _ICoordinates = {
     x: number;
     y: number;
@@ -59,8 +54,6 @@ type ISysPaths = {
     tempIconsPath: string;
     tempWidgetsPath: string;
     configPath: string;
-    // Remove while developing app.
-    uiSavePath: string;
 };
 
 export type IPathType = "SYS" | "ICON" | "GUI";

@@ -37,9 +37,6 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
     const iconsSavePath = path.join(tempPath, "icons");
     const widgetsSavePath = path.join(tempPath, "widgets");
 
-    // Remove while developing app.
-    const uiSavePath = path.join(process.cwd(), "UIs");
-
     const _configPath = configPath;
 
     const sysPaths: IPaths<"SYS"> = {
@@ -51,8 +48,6 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         tempIconsPath: iconsSavePath,
         tempWidgetsPath: widgetsSavePath,
         configPath: _configPath,
-        // Remove while developing app.
-        uiSavePath: uiSavePath,
     };
 
     if (type === "SYS") return sysPaths as IPaths<T>;

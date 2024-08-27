@@ -12,11 +12,13 @@
     "type": "module",
     "dependencies": {
         "@napi-rs/canvas": "^0.1.54",
+        "prompt-sync": "^4.2.0",
         "sharp": "^0.33.5",
         "unzipper": "^0.12.3"
     },
     "devDependencies": {
         "@types/node": "^22.4.1",
+        "@types/prompt-sync": "^4.2.3",
         "@types/unzipper": "^0.10.10",
         "tsx": "^4.19.0",
         "typescript": "^5.5.4"
