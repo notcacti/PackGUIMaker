@@ -35,19 +35,14 @@ export async function crop(type: ICoordinatesType) {
         const [_, path] = imagePathEntries[i];
         const [__, coordinates] = imageCoordinateEntries[i];
 
-        try {
-            cropIcon(
-                spriteSheetPath,
-                path,
-                coordinates.x,
-                coordinates.y,
-                coordinates.width,
-                coordinates.height
-            );
-        } catch (err) {
-            console.error(err);
-            continue;
-        }
+        await cropIcon(
+            spriteSheetPath,
+            path,
+            coordinates.x,
+            coordinates.y,
+            coordinates.width,
+            coordinates.height
+        );
     }
 
     return;
@@ -59,10 +54,12 @@ async function combine() {
         const iconsInfo = generateIconInfo("ICON");
         const guiInfo = generateIconInfo("GUI");
 
-        const repeatImageKeys = ["heart", "armor", "hunger"];
+        let repeatImageKeys = ["heart", "armor", "hunger"];
+        repeatImageKeys.push(...repeatImageKeys.map((item) => `${item}Bg`));
 
         for (const iconInfo of iconsInfo) {
             if (repeatImageKeys.includes(iconInfo.name)) {
+                iconInfo.destCoordinates.width *= 3;
                 const iconBuffer = await repeatIcon(iconInfo.path, 3);
                 iconInfo.path = iconBuffer;
             }

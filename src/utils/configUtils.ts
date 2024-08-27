@@ -1,6 +1,8 @@
 import fs from "fs";
 import { IConfig } from "../types.js";
-import { configPath } from "../index.js";
+import path from "path";
+
+export const configPath = path.join(process.cwd(), "config.json");
 
 // Path to "temp" folder
 // returns path to the config file.
@@ -34,7 +36,8 @@ export function setValue(
     value: any,
     mode: "insert" | "modify" = "insert"
 ): void | null {
-    if (!configPath) return null;
+    if (!configPath)
+        throw new Error("Error while setting value: configPath non-existent");
     if (!fs.existsSync(configPath))
         throw new Error("Path does not exist: " + configPath);
     if (!fs.lstatSync(configPath).isFile())

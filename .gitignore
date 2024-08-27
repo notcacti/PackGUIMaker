@@ -4,3 +4,4 @@ package-lock.json
 __mocks__/
 temp/
 UIs/
+config.json

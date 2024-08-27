@@ -37,14 +37,32 @@ export function getCoordinates<T extends ICoordinatesType>(
         guiCoordinates.twoSlots.width + guiCoordinates.lastSlot.width;
 
     const iconCoordinates: ICoordinates<"ICON"> = {
-        hunger: {
-            x: 52 * scalingFactor,
+        xpBg: {
+            x: 182 * scalingFactor - xpAdjustmentFactor,
+            y: 64 * scalingFactor,
+            width: xpAdjustmentFactor,
+            height: 5 * scalingFactor,
+        },
+        hungerBg: {
+            x: 16 * scalingFactor,
             y: 27 * scalingFactor,
             width: 9 * scalingFactor,
             height: 9 * scalingFactor,
         },
-        hungerBg: {
+        heartBg: {
             x: 16 * scalingFactor,
+            y: 0 * scalingFactor,
+            width: 9 * scalingFactor,
+            height: 9 * scalingFactor,
+        },
+        xp: {
+            x: 0 * scalingFactor,
+            y: 69 * scalingFactor,
+            width: xpAdjustmentFactor * xpPercent,
+            height: 5 * scalingFactor,
+        },
+        hunger: {
+            x: 52 * scalingFactor,
             y: 27 * scalingFactor,
             width: 9 * scalingFactor,
             height: 9 * scalingFactor,
@@ -55,29 +73,11 @@ export function getCoordinates<T extends ICoordinatesType>(
             width: 9 * scalingFactor,
             height: 9 * scalingFactor,
         },
-        heartBg: {
-            x: 16 * scalingFactor,
-            y: 0 * scalingFactor,
-            width: 9 * scalingFactor,
-            height: 9 * scalingFactor,
-        },
         armor: {
             x: 34 * scalingFactor,
             y: 9 * scalingFactor,
             width: 9 * scalingFactor,
             height: 9 * scalingFactor,
-        },
-        xpEmpty: {
-            x: 182 * scalingFactor - xpAdjustmentFactor,
-            y: 64 * scalingFactor,
-            width: xpAdjustmentFactor,
-            height: 5 * scalingFactor,
-        },
-        xp: {
-            x: 0 * scalingFactor,
-            y: 69 * scalingFactor,
-            width: xpAdjustmentFactor * xpPercent,
-            height: 5 * scalingFactor,
         },
     };
 
@@ -105,17 +105,11 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
 
     const { scalingFactor, xpPercent } = configValues;
 
-    // Define heights for each element
-    const guiElementHeight = 22 * scalingFactor;
-    const iconElementHeight = 9 * scalingFactor;
+    // Define xpHeight
     const xpBarHeight = 5 * scalingFactor;
 
-    // Calculate the total height based on the elements involved
-    const canvasHeight = guiElementHeight + iconElementHeight + xpBarHeight;
-
     // Calculate y positions relative to the bottom of the canvas (check prev commit(416e8d2) to see how it was handled before)
-    const bottomOffset = (offset: number) =>
-        canvasHeight - offset * scalingFactor;
+    const bottomOffset = (offset: number) => (22 - offset) * scalingFactor;
 
     // GUI coordinates
     const twoSlots = {
@@ -133,7 +127,7 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
     };
 
     const selector = {
-        x: twoSlots.width - scalingFactor,
+        x: lastSlot.width - scalingFactor,
         y: bottomOffset(22), // slightly above twoSlots and lastSlot (this is where the 2px from those balance)
         width: 22 * scalingFactor,
         height: 22 * scalingFactor,
@@ -153,32 +147,25 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
     const guiWidth =
         guiCoordinates.twoSlots.width + guiCoordinates.lastSlot.width;
 
-    const xpEmpty = {
+    const armor = {
         x: 0,
         y: 0,
-        width: guiWidth,
-        height: xpBarHeight,
-    };
-
-    const xp = {
-        x: 0,
-        y: 0,
-        width: guiWidth * xpPercent,
-        height: xpBarHeight,
+        width: 9 * scalingFactor,
+        height: 9 * scalingFactor,
     };
 
     const heartBase = {
         x: 0,
-        y: xp.height - iconElementHeight - scalingFactor,
-        width: 27 * scalingFactor, // 9 * scalingFactor * 3
-        height: iconElementHeight,
+        y: 9 * scalingFactor + 1 * scalingFactor,
+        width: armor.width,
+        height: armor.height,
     };
 
     const heart = { ...heartBase };
     const heartBg = { ...heartBase };
 
     const hungerBase = {
-        x: guiWidth - heartBase.width,
+        x: guiWidth - heartBase.width * 3,
         y: heartBase.y,
         width: heartBase.width,
         height: heartBase.height,
@@ -187,21 +174,28 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
     const hunger = { ...hungerBase };
     const hungerBg = { ...hungerBase };
 
-    const armor = {
+    const xpBg = {
         x: 0,
-        y: heartBase.y - scalingFactor,
-        width: heartBase.width,
-        height: heartBase.height,
+        y: heartBase.height + armor.height + 2 * scalingFactor,
+        width: guiWidth,
+        height: xpBarHeight,
+    };
+
+    const xp = {
+        x: 0,
+        y: xpBg.y,
+        width: guiWidth * xpPercent,
+        height: xpBarHeight,
     };
 
     const iconCoordinates: ICoordinates<"ICON"> = {
-        hunger,
+        xpBg,
         hungerBg,
-        heart,
         heartBg,
-        armor,
-        xpEmpty,
         xp,
+        hunger,
+        heart,
+        armor,
     };
 
     if (type === "ICON") {

@@ -62,7 +62,7 @@ export async function combineIcons(icons: IIconInfo[]) {
     return canvas;
 }
 
-export function cropIcon(
+export async function cropIcon(
     spriteSheetPath: string,
     outputPath: string,
     x: number, // the x coordinate of the icon
@@ -70,37 +70,36 @@ export function cropIcon(
     width: number,
     height: number
 ) {
-    loadImage(spriteSheetPath)
-        .then((spriteImage) => {
-            const spriteSize = {
-                width,
-                height,
-            };
+    try {
+        const spriteImage = await loadImage(spriteSheetPath);
 
-            const canvas = createCanvas(spriteSize.width, spriteSize.height);
-            const ctx = canvas.getContext("2d");
+        const spriteSize = {
+            width,
+            height,
+        };
 
-            ctx.drawImage(
-                spriteImage,
-                x,
-                y,
-                spriteSize.width,
-                spriteSize.height,
-                0,
-                0,
-                spriteSize.width,
-                spriteSize.height
-            );
+        const canvas = createCanvas(spriteSize.width, spriteSize.height);
+        const ctx = canvas.getContext("2d");
 
-            const iconBuffer = canvas.toBuffer("image/png");
+        ctx.drawImage(
+            spriteImage,
+            x,
+            y,
+            spriteSize.width,
+            spriteSize.height,
+            0,
+            0,
+            spriteSize.width,
+            spriteSize.height
+        );
 
-            savePngBuffer(iconBuffer, outputPath);
-        })
-        .catch((err) => {
-            throw new Error("Error while cropping image: " + err);
-        });
+        const iconBuffer = canvas.toBuffer("image/png");
 
-    return;
+        savePngBuffer(iconBuffer, outputPath);
+        return;
+    } catch (err) {
+        throw new Error("Error while cropping image: " + err);
+    }
 }
 
 export async function repeatIcon(imagePath: string | Buffer, times: number) {

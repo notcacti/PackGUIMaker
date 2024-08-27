@@ -1,7 +1,7 @@
 import path from "path";
 import { IPaths, IPathType } from "../types.js";
 import { getConfig } from "../utils/configUtils.js";
-import { configPath } from "../index.js";
+import { configPath } from "../utils/configUtils.js";
 import { checkAndMkdir } from "../utils/utils.js";
 
 export function getPaths<T extends IPathType>(type: T): IPaths<T> {
@@ -14,15 +14,25 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
     let { bedrock, packFileName } = configValues;
 
     const tempPath = path.join(process.cwd(), "temp");
-    let packSavePath = path.join(tempPath, packFileName ?? "pack");
+    let packSavePath = path.join(tempPath, packFileName);
 
-    const guiFolderPath = bedrock
-        ? path.join(packSavePath, "textures", "gui")
-        : path.join(packSavePath, "assets", "minecraft", "textures", "gui");
+    const guiFolderPath =
+        bedrock === true
+            ? path.join(packSavePath, "textures", "gui")
+            : bedrock === false
+            ? path.join(packSavePath, "assets", "minecraft", "textures", "gui")
+            : bedrock === undefined
+            ? ""
+            : "";
     const iconsPath = path.join(guiFolderPath, "icons.png");
-    const widgetsPath = bedrock
-        ? path.join(guiFolderPath, "gui.png")
-        : path.join(guiFolderPath, "widgets.png");
+    const widgetsPath =
+        bedrock === true
+            ? path.join(guiFolderPath, "gui.png")
+            : bedrock === false
+            ? path.join(guiFolderPath, "widgets.png")
+            : bedrock === undefined
+            ? ""
+            : "";
 
     const iconsSavePath = path.join(tempPath, "icons");
     const widgetsSavePath = path.join(tempPath, "widgets");
@@ -48,12 +58,12 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
     if (type === "SYS") return sysPaths as IPaths<T>;
 
     const iconsPaths: IPaths<"ICON"> = {
-        hunger: path.join(iconsSavePath, "hunger.png"),
+        xpBg: path.join(iconsSavePath, "xpBg.png"),
         hungerBg: path.join(iconsSavePath, "hungerBg.png"),
-        heart: path.join(iconsSavePath, "heart.png"),
         heartBg: path.join(iconsSavePath, "heartBg.png"),
-        xpEmpty: path.join(iconsSavePath, "xpEmpty.png"),
         xp: path.join(iconsSavePath, "xp.png"),
+        hunger: path.join(iconsSavePath, "hunger.png"),
+        heart: path.join(iconsSavePath, "heart.png"),
         armor: path.join(iconsSavePath, "armor.png"),
     };
 
@@ -63,10 +73,6 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
         twoSlots: path.join(widgetsSavePath, "firstTwoSlots.png"),
         lastSlot: path.join(widgetsSavePath, "lastSlot.png"),
         selector: path.join(widgetsSavePath, "selector.png"),
-        gui: path.join(widgetsSavePath, "gui.png"),
-
-        // Remove while developing app.
-        uiImg: path.join(uiSavePath, `${packFileName}_ui.png`),
     };
 
     if (type === "GUI") return guiPaths as IPaths<T>;
@@ -76,12 +82,12 @@ export function getPaths<T extends IPathType>(type: T): IPaths<T> {
 
 // This function checks if the "bedrock" && "packFileName" already exists in the config.
 // If so, it returns them. If not, it returns undefined.
-// If it's undefined then the caller would have to provide the file path or getPath() will throw an error.
+// If configPath is undefined then the caller would have to provide the file path or getPath() will throw an error.
 function getConfigValues() {
     try {
         const config = getConfig();
-        const bedrock = config.bedrock;
-        const packFileName = config.packFileName;
+        const bedrock = config.bedrock ?? undefined;
+        const packFileName = config.packFileName ?? undefined;
 
         return { bedrock, packFileName };
     } catch (err) {
@@ -93,10 +99,10 @@ function getConfigValues() {
 
 // Create all the directories mentioned in getPaths();
 export function initializePaths(paths: IPaths<"SYS">) {
-    for (const path in paths) {
-        if (!path) continue;
+    for (const pth in paths) {
+        if (paths[pth as keyof typeof paths] === undefined) continue;
         try {
-            checkAndMkdir(path);
+            checkAndMkdir(paths[pth as keyof typeof paths]);
         } catch (err) {
             console.error("Error while initialising paths: " + err);
         }

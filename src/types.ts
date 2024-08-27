@@ -13,13 +13,13 @@ type _ICoordinates = {
 };
 
 type IIconCoordinates = {
-    hunger: _ICoordinates;
-    hungerBg: _ICoordinates;
+    xpBg: _ICoordinates;
     heart: _ICoordinates;
+    hunger: _ICoordinates;
     heartBg: _ICoordinates;
-    armor: _ICoordinates;
+    hungerBg: _ICoordinates;
     xp: _ICoordinates;
-    xpEmpty: _ICoordinates;
+    armor: _ICoordinates;
 };
 
 type IGUICoordinates = {
@@ -35,11 +35,11 @@ export type ICoordinates<T extends ICoordinatesType> = T extends "ICON"
     : never;
 
 type IIconPaths = {
+    xpBg: string;
+    heart: string;
     hunger: string;
     hungerBg: string;
-    heart: string;
     heartBg: string;
-    xpEmpty: string;
     xp: string;
     armor: string;
 };
@@ -48,9 +48,6 @@ type IGUIPaths = {
     twoSlots: string;
     lastSlot: string;
     selector: string;
-    gui: string;
-    // Remove while developing app.
-    uiImg: string;
 };
 
 type ISysPaths = {
