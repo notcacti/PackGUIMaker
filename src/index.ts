@@ -1,67 +1,38 @@
-import express from "express";
-import path from "path";
-import make from "./ui-maker.js";
+import { app, BrowserWindow } from "electron";
+import { PORT, startServer } from "./server.js";
 
-const app = express();
-const PORT = 7498;
+let mainWindow: BrowserWindow | null;
 
-const staticRootPath = path.join(process.cwd(), "wwwroot");
-app.use(express.static(staticRootPath));
-app.use(express.json({ limit: "50mb" }));
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        width: 1280,
+        height: 720,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
+    });
 
-app.post("/api/genUi", async (req, res) => {
-    const { packName, packBufferString, xpPercentString, upscaleRateString } =
-        req.body;
+    mainWindow.loadURL(`http://localhost:${PORT}`);
 
-    const xpPercent = parseFloat(xpPercentString);
-    const upscaleRate = parseInt(upscaleRateString);
-    const packBuffer = Buffer.from(packBufferString, "base64");
+    mainWindow.on("closed", () => {
+        mainWindow = null;
+    });
+}
 
-    if (Number.isNaN(xpPercent) || Number.isNaN(upscaleRate))
-        res.status(400).send({
-            message: "Invalid Body Parameters! (xpupscale)",
-        });
+app.on("ready", () => {
+    startServer();
+    createWindow();
+});
 
-    if (!packName || !packBuffer || !xpPercent || !upscaleRate)
-        return res
-            .status(400)
-            .send({ message: "Invalid Body Parameters! (no spec param)" });
-
-    if (!packName.endsWith(".zip") && !packName.endsWith(".mcpack"))
-        return res
-            .status(400)
-            .send({ message: "Invalid Body Parameters! (wrong pack)" });
-
-    if (upscaleRate <= 0 && upscaleRate >= 11)
-        return res
-            .status(400)
-            .send({ message: "Invalid Body Parameters!(invalid upscale)" });
-
-    if (xpPercent <= 0 && xpPercent >= 1)
-        return res
-            .status(400)
-            .send({ message: "Invalid Body Parameters!(invalid xp)" });
-
-    try {
-        const imgBuffer = await make(
-            packName,
-            packBuffer,
-            upscaleRate,
-            xpPercent
-        );
-
-        res.setHeader("Content-Type", "image/png");
-        res.status(201).send(imgBuffer);
-    } catch (err) {
-        console.error("Error while making UI:", err);
-        res.status(500).send({ message: "Internal Server Error" });
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        app.quit();
     }
 });
 
-app.get("/", (req, res) => {
-    res.status(200).sendFile(path.join(staticRootPath, "index.html"));
-});
-
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+app.on("activate", () => {
+    if (mainWindow === null) {
+        createWindow();
+    }
 });
