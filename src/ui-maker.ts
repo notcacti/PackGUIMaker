@@ -7,14 +7,13 @@ import {
     getScale,
     unzipFile,
 } from "./utils/utils.js";
-import path from "path";
 import { crop, imageDimsFix, processImage } from "./helpers/imageProcessing.js";
-import { savePngBuffer } from "./utils/imageUtils.js";
 
 // packZipPath - path exactly to the pack zip file.
 // initialises paths and config
 async function initialize(
-    packZipPath: string,
+    packFileName: string,
+    packZipBuffer: Buffer,
     upscaleRate: number,
     xpPercent: number
 ) {
@@ -22,13 +21,12 @@ async function initialize(
 
     try {
         // Pack Initialisation
-        const packFileName = packZipPath.split("/").pop();
         setValue("packFileName", packFileName, "insert"); // Set the name in config.
 
         const folderPaths = getPaths("SYS"); // Get Paths.
 
         // Saves to folderPath.packFolder
-        await unzipFile(packZipPath, folderPaths.packFolder);
+        await unzipFile(packZipBuffer, folderPaths.packFolder);
 
         const bedrock = checkBedrock(folderPaths.packFolder);
         if (bedrock) convertBedrock(folderPaths.packFolder);
@@ -42,19 +40,19 @@ async function initialize(
         setValue("upscaleRate", upscaleRate, "insert");
         setValue("xpPercent", xpPercent, "insert");
     } catch (err) {
-        console.error("Error while initialising: " + err);
-        process.exit(1);
+        throw new Error("Error while initialising: " + err);
     }
 }
 
-// Returns the path where it saved the UI (in app it will just require the user to do that.)
+// Returns the buffer of the UI
 export default async function main(
-    packZipPath: string,
+    packName: string,
+    packZipBuffer: Buffer,
     upscaleRate: number,
     xpPercent: number
 ) {
     // Initialise Config && Paths.
-    await initialize(packZipPath, upscaleRate, xpPercent);
+    await initialize(packName, packZipBuffer, upscaleRate, xpPercent);
 
     // Get system paths for saving.
     const systemPaths = getPaths("SYS");
@@ -66,8 +64,7 @@ export default async function main(
             systemPaths.packWidgetsPath
         );
     } catch (err) {
-        console.error(err);
-        process.exit(1);
+        throw new Error(err as string);
     }
 
     // Crop all the sprites from icons.png
@@ -78,16 +75,8 @@ export default async function main(
     // Process the whole image with the cutouts.
     const uiImageBuffer = await processImage();
 
-    // Remove while developing app.
-    // replace with sending to their computer save dialog.
-    const savePath = path.join(
-        process.cwd(),
-        `${packZipPath.split("/").pop()}_ui.png`
-    );
-    savePngBuffer(uiImageBuffer, savePath);
-
     // clean up extra files
     clean([systemPaths.tempPath, configPath]);
 
-    return savePath;
+    return uiImageBuffer;
 }

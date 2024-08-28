@@ -6,8 +6,7 @@ export function getCoordinates<T extends ICoordinatesType>(
 ): ICoordinates<T> {
     const configValues = getConfigValues();
     if (!configValues) {
-        console.error("Couldn't fetch config - coordinates. Terminating.");
-        process.exit(1);
+        throw new Error("Couldn't fetch config - coordinates.");
     }
 
     const { scalingFactor, xpPercent } = configValues;
@@ -99,8 +98,7 @@ export function getDestinationCoordinates<T extends ICoordinatesType>(
 ): ICoordinates<T> {
     const configValues = getConfigValues();
     if (!configValues) {
-        console.error("Couldn't fetch config - coordinates. Terminating.");
-        process.exit(1);
+        throw new Error("Couldn't fetch config - coordinates.");
     }
 
     const { scalingFactor, xpPercent } = configValues;

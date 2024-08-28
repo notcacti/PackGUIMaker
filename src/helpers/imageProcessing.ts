@@ -157,8 +157,7 @@ function getUpscaleRate() {
         return upscaleRate;
     } catch (err) {
         // Handle error from getConfig()
-        console.error("Error fetching config: ", err);
-        process.exit(1);
+        throw new Error("Error fetching config: " + err);
     }
 }
 

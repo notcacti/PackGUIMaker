@@ -1,86 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GUI Maker App</title>
-    <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-<div class="main-container">
-    <h1 id="title">Create GUI</h1>
-    <div class="version-buttons-container">
-        <a id="bedrock" class="version-button" href="#" style="--color:#1e9bff;" onclick="setVersion(1)">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            Bedrock
-        </a>
-        <a id="java" class="version-button active" href="#" style="--color: #ff1867;" onclick="setVersion(0)">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            Java
-        </a>
-    </div>
-    <div class="slider-container">
-        <label for="upscale-slider">Upscale Multiplier</label>
-        <div class="inputs">
-            <input
-                    type="range"
-                    id="upscale-slider"
-                    min="1"
-                    max="10"
-                    value="1"
-                    step="1"
-                    oninput="updateUpscaleValue(this.value)"
-            />
-            <input
-                    type="number"
-                    id="upscale-input"
-                    min="1"
-                    max="10"
-                    value="1"
-                    step="1"
-                    oninput="updateSliderValue(this.value)"
-            />
-            <span>x</span>
-        </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>GUI Maker App</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="main-container">
+            <h1 id="title">Create GUI</h1>
+            <div class="version-buttons-container">
+                <a
+                    id="bedrock"
+                    class="version-button"
+                    href="#"
+                    style="--color: #1e9bff"
+                    onclick="setVersion(1)"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Bedrock
+                </a>
+                <a
+                    id="java"
+                    class="version-button active"
+                    href="#"
+                    style="--color: #ff1867"
+                    onclick="setVersion(0)"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Java
+                </a>
+            </div>
+            <div class="slider-container">
+                <label for="upscale-slider">Upscale Multiplier</label>
+                <div class="inputs">
+                    <input
+                        type="range"
+                        id="upscale-slider"
+                        min="1"
+                        max="10"
+                        value="1"
+                        step="1"
+                        oninput="updateUpscaleValue(this.value)"
+                    />
+                    <input
+                        type="number"
+                        id="upscale-input"
+                        min="1"
+                        max="10"
+                        value="1"
+                        step="1"
+                        oninput="updateSliderValue(this.value)"
+                    />
+                    <span>x</span>
+                </div>
 
-        <label for="xp-slider">XP Bar Filled %</label>
-        <div class="inputs">
-            <input
-                    type="range"
-                    id="xp-slider"
-                    min="1"
-                    max="99"
-                    value="1"
-                    step="1"
-                    oninput="updateXpValue(this.value)"
-            />
-            <input
-                    type="number"
-                    id="xp-input"
-                    min="1"
-                    max="99"
-                    value="1"
-                    step="1"
-                    oninput="updateXpSliderValue(this.value)"
-            />
-            <span>%</span>
+                <label for="xp-slider">XP Bar Filled %</label>
+                <div class="inputs">
+                    <input
+                        type="range"
+                        id="xp-slider"
+                        min="1"
+                        max="99"
+                        value="1"
+                        step="1"
+                        oninput="updateXpValue(this.value)"
+                    />
+                    <input
+                        type="number"
+                        id="xp-input"
+                        min="1"
+                        max="99"
+                        value="1"
+                        step="1"
+                        oninput="updateXpSliderValue(this.value)"
+                    />
+                    <span>%</span>
+                </div>
+            </div>
+            <div class="upload-container">
+                <div class="upload-button" id="file-upload-button">
+                    <a href="#">Upload Pack</a>
+                </div>
+                <input
+                    id="file-upload"
+                    type="file"
+                    class="upload-input"
+                    accept=".zip, .mcpack"
+                />
+            </div>
+            <p class="file-info">Accepted formats: .zip, .mcpack</p>
         </div>
-    </div>
-    <div class="upload-container">
-        <div class="upload-button" id="file-upload-button">
-            <a href="#">Upload Pack</a>
-        </div>
-        <input id="file-upload" type="file" class="upload-input" accept=".zip, .mcpack" />
-
-    </div>
-    <p class="file-info">Accepted formats: .zip, .mcpack</p>
-</div>
-<script src="script.js"></script>
-</body>
+        <script src="script.js"></script>
+    </body>
 </html>

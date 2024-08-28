@@ -2,16 +2,24 @@ import fs from "fs";
 import unzipper from "unzipper";
 import path from "path";
 import { loadImage } from "@napi-rs/canvas";
+import { Readable } from "stream";
 
-export function unzipFile(zipFilePath: string, outputDir: string) {
-    return new Promise<void | Error>((resolve, reject) => {
-        fs.createReadStream(zipFilePath)
+export function unzipFile(
+    zipFileBuffer: Buffer,
+    outputDir: string
+): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const bufferStream = new Readable();
+        bufferStream.push(zipFileBuffer);
+        bufferStream.push(null); // End of stream indicator.
+
+        // Pipe the readable stream to unzipper.
+        bufferStream
             .pipe(unzipper.Extract({ path: outputDir }))
             .on("close", () => {
                 resolve();
             })
             .on("error", (err) => {
-                console.log("erreror");
                 reject(err);
             });
     });

@@ -7,8 +7,7 @@ import { checkAndMkdir } from "../utils/utils.js";
 export function getPaths<T extends IPathType>(type: T): IPaths<T> {
     const configValues = getConfigValues();
     if (!configValues) {
-        console.error("Couldn't fetch config - paths. Terminating.");
-        process.exit(1);
+        throw new Error("Couldn't fetch config - paths.");
     }
 
     let { bedrock, packFileName } = configValues;

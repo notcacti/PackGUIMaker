@@ -1,40 +1,67 @@
-import ps from "prompt-sync";
-import fs from "fs";
+import express from "express";
+import path from "path";
 import make from "./ui-maker.js";
 
-const prompt = ps();
+const app = express();
+const PORT = 7498;
 
-const packPath = prompt(
-    "Drag your pack onto the window. (or) Paste its path here: "
-);
-if (!fs.existsSync(packPath)) {
-    console.log("Invalid Path!");
-    process.exit(1);
-}
+const staticRootPath = path.join(process.cwd(), "wwwroot");
+app.use(express.static(staticRootPath));
+app.use(express.json({ limit: "50mb" }));
 
-let xpPercentPrompt = prompt(
-    "How much do you want the XP bar to be filled (in %)?\n(sometimes it won't work, try again if that happens): "
-);
+app.post("/api/genUi", async (req, res) => {
+    const { packName, packBufferString, xpPercentString, upscaleRateString } =
+        req.body;
 
-let xpPercent = parseInt(xpPercentPrompt);
-if (isNaN(xpPercent) || xpPercent < 1 || xpPercent > 100) {
-    console.log("Invalid XP fill value! It must be between 1 and 100.");
-    process.exit(1);
-}
+    const xpPercent = parseFloat(xpPercentString);
+    const upscaleRate = parseInt(upscaleRateString);
+    const packBuffer = Buffer.from(packBufferString, "base64");
 
-xpPercent = xpPercent / 100;
+    if (Number.isNaN(xpPercent) || Number.isNaN(upscaleRate))
+        res.status(400).send({
+            message: "Invalid Body Parameters! (xpupscale)",
+        });
 
-const upscaleRate = parseInt(
-    prompt("How much upscaling do you want on the image (1 - 10): ")
-);
-if (isNaN(upscaleRate) || upscaleRate < 1 || upscaleRate > 10) {
-    console.log("Invalid upscaling rate! It must be between 1 and 10.");
-    process.exit(1);
-}
+    if (!packName || !packBuffer || !xpPercent || !upscaleRate)
+        return res
+            .status(400)
+            .send({ message: "Invalid Body Parameters! (no spec param)" });
 
-(async () => {
-    const savePath = await make(packPath, upscaleRate, xpPercent);
+    if (!packName.endsWith(".zip") && !packName.endsWith(".mcpack"))
+        return res
+            .status(400)
+            .send({ message: "Invalid Body Parameters! (wrong pack)" });
 
-    console.log(`Saved the generated UI at: ${savePath}`);
-    process.exit(0);
-})();
+    if (upscaleRate <= 0 && upscaleRate >= 11)
+        return res
+            .status(400)
+            .send({ message: "Invalid Body Parameters!(invalid upscale)" });
+
+    if (xpPercent <= 0 && xpPercent >= 1)
+        return res
+            .status(400)
+            .send({ message: "Invalid Body Parameters!(invalid xp)" });
+
+    try {
+        const imgBuffer = await make(
+            packName,
+            packBuffer,
+            upscaleRate,
+            xpPercent
+        );
+
+        res.setHeader("Content-Type", "image/png");
+        res.status(201).send(imgBuffer);
+    } catch (err) {
+        console.error("Error while making UI:", err);
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+});
+
+app.get("/", (req, res) => {
+    res.status(200).sendFile(path.join(staticRootPath, "index.html"));
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
