@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import { PORT, startServer } from "./server.js";
 
-let mainWindow: BrowserWindow | null;
+let mainWindow: any | null;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
