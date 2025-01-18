@@ -66,13 +66,11 @@ If you prefer to download a precompiled binary:
 
 2. **Download the Latest Release**
 
-    Download the appropriate binary for your operating system from the latest release.
+    Download the appropriate binary for your operating system from the latest release. (only windows is supported as of now)
 
 3. **Run the Application**
 
     - On **Windows**, double-click the executable file.
-    - On **macOS**, open the `.app` file from the extracted folder.
-    - On **Linux**, you might need to grant execute permissions with `chmod +x <filename>` and then run the executable.
 
 ## Usage
 
@@ -90,6 +88,14 @@ If you prefer to download a precompiled binary:
     - Select a pack from your local filesystem.
     - The application will process the file and generate a UI image based on the selected settings and uploaded file.
     - The resulting image will be automatically downloaded to your device.
+
+## Images
+
+![App UI](previews/App_UI.png)
+
+![Pack1](previews/Pack1.png)
+
+![Pack2](previews/Pack2.png)
 
 ## Acknowledgements
 

@@ -1,19 +1,23 @@
-import { app, BrowserWindow } from "electron";
-import { PORT, startServer } from "./server.js";
+import { app, BrowserWindow, Menu } from "electron";
+import { startServer } from "./server.js";
 
-let mainWindow: any | null;
+let mainWindow: BrowserWindow | null;
 
-function createWindow() {
+function createWindow(port: number) {
     mainWindow = new BrowserWindow({
-        width: 1280,
-        height: 720,
+        width: 1500,
+        height: 1000,
+        title: "Cacti's GUI Maker",
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
         },
+        frame: true,
     });
 
-    mainWindow.loadURL(`http://localhost:${PORT}`);
+    mainWindow.loadURL(`http://localhost:${port}`);
+
+    Menu.setApplicationMenu(null);
 
     mainWindow.on("closed", () => {
         mainWindow = null;
@@ -21,18 +25,21 @@ function createWindow() {
 }
 
 app.on("ready", () => {
-    startServer();
-    createWindow();
+    startServer()
+        .then((port) => {
+            createWindow(port);
+        })
+        .catch((err) => {
+            console.error(`Failed to start server: ${err}`);
+
+            if (process.platform !== "darwin") {
+                app.quit();
+            }
+        });
 });
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
         app.quit();
-    }
-});
-
-app.on("activate", () => {
-    if (mainWindow === null) {
-        createWindow();
     }
 });
