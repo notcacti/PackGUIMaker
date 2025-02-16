@@ -1,5 +1,5 @@
 import path from "path";
-import { IPaths, IPathType } from "../types.js";
+import { IPaths, IPathType } from "../../types.js";
 import { getConfig } from "../utils/configUtils.js";
 import { configPath } from "../utils/configUtils.js";
 import { checkAndMkdir } from "../utils/utils.js";

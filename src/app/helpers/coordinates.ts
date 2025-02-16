@@ -1,4 +1,4 @@
-import { ICoordinates, ICoordinatesType } from "../types.js";
+import { ICoordinates, ICoordinatesType } from "../../types.js";
 import { getConfig } from "../utils/configUtils.js";
 
 export function getCoordinates<T extends ICoordinatesType>(

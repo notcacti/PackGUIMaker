@@ -1,7 +1,7 @@
 import { createCanvas, Image, loadImage } from "@napi-rs/canvas";
 import fs from "fs";
 import sharp from "sharp";
-import { IIconInfo } from "../types.js";
+import { IIconInfo } from "../../types.js";
 
 // Returns the buffer of the upscaled png.
 export async function upscaleImage(input: string | Buffer, scale: number) {

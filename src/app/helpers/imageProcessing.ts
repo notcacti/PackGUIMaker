@@ -1,4 +1,4 @@
-import { ICoordinatesType, IIconInfo } from "../types.js";
+import { ICoordinatesType, IIconInfo } from "../../types.js";
 import { getPaths } from "./paths.js";
 import {
     combineIcons,

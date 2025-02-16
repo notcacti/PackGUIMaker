@@ -1,6 +1,6 @@
 {
     "name": "cacti-gui-maker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "CactiFX <fxcacti@gmail.com>",
     "main": "dist/index.js",
     "description": "Cacti GUI Maker",

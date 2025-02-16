@@ -1,5 +1,5 @@
 import fs from "fs";
-import { IConfig } from "../types.js";
+import { IConfig } from "../../types.js";
 import path from "path";
 
 export const configPath = path.join(process.cwd(), "config.json");
