@@ -71,6 +71,7 @@ If you prefer to download a precompiled binary:
 3. **Run the Application**
 
     - On **Windows**, double-click the executable file.
+    - A SmartScreen pop-up might appear when running the application for the first time. If it does, click on 'More info' and then 'Run anyway' to proceed. This Microsoft feature warns users about unrecognized programs that may not have a digital signature or established reputation, so you can safely continue using the app.
 
 ## Usage
 
