@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "description": "Cacti GUI Maker",
     "keywords": [],
-    "license": "ISC",
+    "license": "MPL-2.0",
     "scripts": {
         "start": "electron .",
         "build": "tsc",
@@ -19,7 +19,7 @@
             "output": "releases/${platform}/${arch}"
         },
         "files": [
-            "build/",
+            "assets/",
             "dist/**/*",
             "wwwroot/**/*"
         ],
@@ -31,7 +31,10 @@
                     "**/*"
                 ]
             }
-        ]
+        ],
+        "win": {
+            "icon": "assets/icon.ico"
+        }
     },
     "type": "module",
     "dependencies": {

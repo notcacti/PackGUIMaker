@@ -79,3 +79,10 @@ export type IIconInfo = {
     path: string | Buffer;
     destCoordinates: _ICoordinates;
 };
+
+export type IPackData = {
+    packName: string;
+    packBufferString: string;
+    xpPercent: number;
+    upscaleRate: number;
+};

@@ -74,45 +74,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const bodyContent = {
                 packName: file.name,
                 packBufferString: base64String,
-                xpPercentString: ($("xp-slider").value / 100).toString(),
-                upscaleRateString: $("upscale-slider").value,
+                xpPercent: $("xp-slider").value / 100,
+                upscaleRate: Number($("upscale-slider").value),
             };
 
-            try {
-                const response = await fetch("/api/genUi", {
-                    method: "POST",
-                    body: JSON.stringify(bodyContent),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
+            const result = await window.electron.generateUI(bodyContent);
 
-                if (response.status === 500) {
-                    alert(
-                        "Something happened while generating the UI.\nRefresh and try again."
-                    );
-                    return;
-                }
-                try {
-                    const blob = await response.blob();
-                    const imageUrl = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = imageUrl;
-                    link.download = `${file.name}_ui.png`;
-
-                    // this line is required for Firefox.
-                    document.body.appendChild(link);
-
-                    link.click();
-
-                    URL.revokeObjectURL(imageUrl);
-
-                    document.body.removeChild(link);
-                } catch (err) {
-                    alert("Unable to download UI");
-                }
-            } catch (error) {
-                console.error("Error while making UI:", error);
+            if (result.success) {
+                alert("Successfully Saved the UI");
+            } else {
+                alert("Error: " + result.message);
             }
         };
 
