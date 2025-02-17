@@ -1,7 +1,7 @@
 import { app, dialog, ipcMain, Menu, BrowserWindow } from "electron";
 import path from "path";
 import { IPackData } from "./types.js";
-import make from "./app/src.js";
+import make from "./app/index.js";
 import { writeFileSync } from "fs";
 
 let mainWindow: BrowserWindow | null;
